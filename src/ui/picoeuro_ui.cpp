@@ -37,14 +37,24 @@ void PicoEuroUI::draw()
     else
         io->setLedBottom(false);
 
-    if (io->potValue > 512)
+
+    //we enable the leds only if the encoder is pressed:
+    if (io->btnEnc->isPressed())
     {
-        io->setLedLeft(false);
-        io->setLedRight(true);
+        if (io->potValue > 2048)
+        {
+            io->setLedLeft(false);
+            io->setLedRight(true);
+        }
+        else
+        {
+            io->setLedLeft(true);
+            io->setLedRight(false);
+        }
     }
     else
     {
-        io->setLedLeft(true);
+        io->setLedLeft(false);
         io->setLedRight(false);
     }
 }

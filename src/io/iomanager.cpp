@@ -3,6 +3,11 @@
 
 IOManager *IOManager::_instance = NULL;
 
+/**
+ * @brief This gives us a singleton instance for input/output
+ * 
+ * @return IOManager* 
+ */
 IOManager *IOManager::getInstance()
 {
     if (!_instance)
@@ -13,7 +18,10 @@ IOManager *IOManager::getInstance()
 
 IOManager::IOManager()
 {
+    //otherwise it would be 10 by default
     analogReadResolution(12);
+
+    //create the 3 buttons
     btnEnc = new Bounce2::Button();
     btnTop = new Bounce2::Button();
     btnBottom = new Bounce2::Button();
@@ -28,15 +36,14 @@ IOManager::IOManager()
     btnTop->setPressedState(LOW);
     btnBottom->setPressedState(LOW);
 
+    //encoder init
     enc = new RotaryEncoder(PIN_ENC_A, PIN_ENC_B, RotaryEncoder::LatchMode::FOUR3);
 
+    //define all the output pins:
     pinMode(PIN_LED1, OUTPUT);
     pinMode(PIN_LED2, OUTPUT);
     pinMode(PIN_LED3, OUTPUT);
     pinMode(PIN_LED4, OUTPUT);
-
-    //pinMode(PIN_GATE_IN_1, INPUT);
-    //pinMode(PIN_GATE_IN_2, INPUT);
 
     pinMode(PIN_GATE_OUT_1, OUTPUT);
     pinMode(PIN_GATE_OUT_2, OUTPUT);
@@ -44,6 +51,11 @@ IOManager::IOManager()
     pinMode(PIN_GATE_OUT_4, OUTPUT);
 }
 
+/**
+ * @brief Read all the inputs values:
+ * Buttons, encoder, potentiometer, CV inputs, gate inputs
+ * 
+ */
 void IOManager::updateInputs()
 {
     // buttons
@@ -92,19 +104,21 @@ void IOManager::setLedBottom(bool state)
 {
     digitalWrite(PIN_LED_BTN_BOTTOM, state);
 }
+
+//Gates are inverted electrially, so we need to invert the desired state !
 void IOManager::setGateOut1(bool state)
 {
-    digitalWrite(PIN_GATE_OUT_1, state);
+    digitalWrite(PIN_GATE_OUT_1, !state);
 }
 void IOManager::setGateOut2(bool state)
 {
-    digitalWrite(PIN_GATE_OUT_2, state);
+    digitalWrite(PIN_GATE_OUT_2, !state);
 }
 void IOManager::setGateOut3(bool state)
 {
-    digitalWrite(PIN_GATE_OUT_3, state);
+    digitalWrite(PIN_GATE_OUT_3, !state);
 }
 void IOManager::setGateOut4(bool state)
 {
-    digitalWrite(PIN_GATE_OUT_4, state);
+    digitalWrite(PIN_GATE_OUT_4, !state);
 }

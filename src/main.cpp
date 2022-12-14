@@ -45,19 +45,8 @@ void loop1()
 void initState()
 {
 
-  // init the abacus state and tracks:
+  // init the module's state:
   state = new PicoEuroState_t;
-}
-
-void configureIO()
-{
-
- 
-
-  //digitalWrite(PIN_LED_LEFT, HIGH);
-  //digitalWrite(PIN_LED_RIGHT, HIGH);
-  //digitalWrite(PIN_LED_BTN_TOP, HIGH);
-  //digitalWrite(PIN_LED_BTN_BOTTOM, HIGH);
 }
 
 void splash()
@@ -89,28 +78,35 @@ void setup()
 
   splash();
 
-  disp->clearDisplay();
-  disp->display();
-
   initState();
 
-  configureIO();
-
-  // delay(4000);
   Serial.println(sizeof(PicoEuroState_t));
 
   EEPROM.begin(4096);
 
   picoEuroUI = new PicoEuroUI(disp, state);
-  // presetsUI = new PresetsUI(disp, abacus);
+  
   ui = picoEuroUI;
-  // ui = presetsUI;
 
+  
   isInitialized = true;
 }
 
 void loop()
 {
+  auto io = IOManager::getInstance();
+  io->updateInputs();
+  
+  bool isEncoderPressed = io->btnEnc->isPressed();
 
-  IOManager::getInstance()->updateInputs();
+  //Serial.println(isEncoderPressed);
+
+  io->setGateOut1(isEncoderPressed);
+  io->setGateOut2(isEncoderPressed);
+  io->setGateOut3(isEncoderPressed);
+  io->setGateOut4(isEncoderPressed);
+  
+  
+  
+
 }
