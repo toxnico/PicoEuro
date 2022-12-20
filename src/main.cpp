@@ -68,8 +68,17 @@ void setup()
   //  put your setup code here, to run once:
   Serial.begin(9600);
 
+  //Init the pins for I2C
   Wire.setSDA(16);
   Wire.setSCL(17);
+
+  //Init the pins for SPI
+  //SPI.setCS(13);
+  //SPI.setSCK(10);
+  //SPI.setTX(11);
+  //SPI.begin();
+
+  //Init display
   disp = new Adafruit_SSD1306(128, 64, &Wire, -1, 800000 * 2, 100000);
   disp->begin(SSD1306_SWITCHCAPVCC, 0x3C);
   disp->setFont(&Org_01);
@@ -87,7 +96,6 @@ void setup()
   picoEuroUI = new PicoEuroUI(disp, state);
   
   ui = picoEuroUI;
-
   
   isInitialized = true;
 }
@@ -106,7 +114,13 @@ void loop()
   io->setGateOut3(isEncoderPressed);
   io->setGateOut4(isEncoderPressed);
   
+  //analog outputs test:
+  int potValue = io->potValue;
   
+  //just in case
+  int dacOut = constrain(potValue, 0, 4095);
   
+  io->dac->fastWriteA(dacOut);
+  io->dac->fastWriteB(dacOut);
 
 }
