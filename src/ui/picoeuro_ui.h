@@ -4,6 +4,7 @@
 #include "abstract_ui.h"
 #include "config.h"
 #include "picoeuro/picoeuro_state.h"
+#include <MCP_DAC.h>
 
 class PicoEuroUI : public AbstractUI
 {
@@ -13,6 +14,8 @@ public:
     PicoEuroUI(Adafruit_SSD1306 *disp, PicoEuroState_t *state);
     void draw();    
     
+    
+
     ////////////////////
     // Event handlers //
     ////////////////////

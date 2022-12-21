@@ -1,8 +1,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define ABACUS_VERSION "0.1"
-#define SPLASH_DURATION 1000
+#define ABACUS_VERSION "0.1.2"
+#define SPLASH_DURATION 2000
 
 #define ENCODER_DIRECTION -1
 
@@ -34,6 +34,12 @@
 #define PIN_GATE_OUT_2 21
 #define PIN_GATE_OUT_3 20
 #define PIN_GATE_OUT_4 9
+
+#define PIN_I2C_SDA 16
+#define PIN_I2C_SCL 17
+#define PIN_SPI_SCK 10
+#define PIN_SPI_MOSI 11
+#define PIN_SPI_CS 13
 
 #define ENCODER_SPEED_THRESHOLD 300
 #define CLICK_DELAY 300

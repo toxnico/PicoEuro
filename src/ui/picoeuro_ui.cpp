@@ -4,6 +4,9 @@
 #include "graphics/graphics.h"
 #include "picoeuro/picoeuro_state.h"
 #include "io/iomanager.h"
+#include <MCP_DAC.h>
+
+
 
 PicoEuroUI::PicoEuroUI(Adafruit_SSD1306 *disp, PicoEuroState_t *state)
     : AbstractUI(disp, state)

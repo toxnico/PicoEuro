@@ -39,10 +39,9 @@ IOManager::IOManager()
     //encoder init
     enc = new RotaryEncoder(PIN_ENC_A, PIN_ENC_B, RotaryEncoder::LatchMode::FOUR3);
 
-    //DAC init
-    dac = new MCP4922(11, 10);
-    //dac->setGPIOpins(10, 12, 11, 13);
-    
+    //DAC init: hardware SPI but #1
+    dac = new MCP4922(255,255, &SPI1);
+    dac->setGPIOpins(PIN_SPI_SCK, -1, PIN_SPI_MOSI, PIN_SPI_CS);
 
     //define all the output pins:
     pinMode(PIN_LED1, OUTPUT);
