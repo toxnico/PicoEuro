@@ -2,22 +2,26 @@
 #define ABSTRACT_UI_H
 
 #include <Adafruit_SSD1306.h>
-#include "picoeuro/picoeuro_state.h"
+#include "peacock/peacock_state.h"
 
 class AbstractUI
 {
 protected:
     Adafruit_SSD1306 *disp = NULL;
-    PicoEuroState_t *state = NULL;
+    PeacockState_t *state = NULL;
 
 public:
-    AbstractUI(Adafruit_SSD1306 *disp, PicoEuroState_t *state)
+    AbstractUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
     {
         this->disp = disp;
         this->state = state;
     }
 
     virtual void draw() {}
+    virtual void handleButtons() {}
+
+    virtual void onEnter() {}
+    virtual void onExit() {}
 
 /*
     virtual void onBtnTopClick() {}

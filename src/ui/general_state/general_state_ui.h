@@ -1,17 +1,17 @@
-#ifndef ABACUS_UI_H
-#define ABACUS_UI_H
+#ifndef GENERAL_STATE_UI_H
+#define GENERAL_STATE_UI_H
 
-#include "abstract_ui.h"
+#include "../abstract_ui.h"
 #include "config.h"
-#include "picoeuro/picoeuro_state.h"
+#include "peacock/peacock_state.h"
 #include <MCP_DAC.h>
 
-class PicoEuroUI : public AbstractUI
+class GeneralStateUI : public AbstractUI
 {
 private:
     
 public:
-    PicoEuroUI(Adafruit_SSD1306 *disp, PicoEuroState_t *state);
+    GeneralStateUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();    
     
     
@@ -27,4 +27,4 @@ public:
     */
 };
 
-#endif // ABACUS_UI_H
+#endif // GENERAL_STATE_UI_H

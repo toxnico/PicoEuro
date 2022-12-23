@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 #define ABACUS_VERSION "0.1.2"
-#define SPLASH_DURATION 2000
+#define SPLASH_DURATION 200
 
 #define ENCODER_DIRECTION -1
 
@@ -24,16 +24,16 @@
 #define PIN_LED_LEFT PIN_LED3
 #define PIN_LED_RIGHT PIN_LED4
 
-#define PIN_CV_IN_1 27
-#define PIN_CV_IN_2 28
+#define PIN_CV_IN_0 27
+#define PIN_CV_IN_1 28
 
-#define PIN_GATE_IN_1 7
-#define PIN_GATE_IN_2 8
+#define PIN_GATE_IN_0 7
+#define PIN_GATE_IN_1 8
 
-#define PIN_GATE_OUT_1 22
-#define PIN_GATE_OUT_2 21
-#define PIN_GATE_OUT_3 20
-#define PIN_GATE_OUT_4 9
+#define PIN_GATE_OUT_0 22
+#define PIN_GATE_OUT_1 21
+#define PIN_GATE_OUT_2 20
+#define PIN_GATE_OUT_3 9
 
 #define PIN_I2C_SDA 16
 #define PIN_I2C_SCL 17
@@ -44,5 +44,22 @@
 #define ENCODER_SPEED_THRESHOLD 300
 #define CLICK_DELAY 300
 #define LONG_PRESS_DELAY 2000
+
+//for input multisampling
+#define ANALOG_READ_SAMPLE_COUNT 20
+
+#define MAX_UI_COUNT 10
+
+/* CALIBRATION STUFF */
+
+//number of analog inputs
+#define ANALOG_INPUTS_COUNT 2
+//number of voltages calibrated on inputs
+#define INPUT_CALIBRATIONS_COUNT 6
+
+//number of analog outputs
+#define ANALOG_OUTPUTS_COUNT 2
+//number of voltages calibrated on outputs
+#define OUTPUT_CALIBRATIONS_COUNT 5
 
 #endif // CONFIG_H

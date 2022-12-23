@@ -4,23 +4,25 @@
 #include <Adafruit_SSD1306.h>
 #include <Fonts/Org_01.h>
 #include "config.h"
-#include "picoeuro/picoeuro_state.h"
-#include "ui/picoeuro_ui.h"
+#include "peacock/peacock_state.h"
+#include "ui/general_state/general_state_ui.h"
+#include "ui/input_calibration/input_calibration_ui.h"
 #include "io/iomanager.h"
 #include "images/peacock_splash.h"
+#include "ui/uimanager.h"
 
 #include <MCP_DAC.h>
 
 Adafruit_SSD1306 *disp = NULL;
 
-AbstractUI *ui = NULL;
-PicoEuroUI *picoEuroUI = NULL;
-// PresetsUI *presetsUI = NULL;
+//AbstractUI *ui = NULL;
+GeneralStateUI *generalStateUI = NULL;
+InputCalibrationUI *inputCalibrationUI = NULL;
+
 
 bool isInitialized = false;
 
-PicoEuroState_t *state = NULL;
-
+PeacockState_t *state = NULL;
 
 void setup1()
 {
@@ -37,7 +39,8 @@ void loop1()
 
   disp->clearDisplay();
 
-  ui->draw();
+  UIManager::getInstance()->currentUI()->draw();
+  
   // disp->fillRect(0,0,127,63,WHITE);
   disp->display();
   // needRedraw = false;
@@ -47,14 +50,29 @@ void initState()
 {
 
   // init the module's state:
-  state = new PicoEuroState_t;
+  state = new PeacockState_t;
+
+  // init the input calibration values
+  uint8_t voltage = 0;
+
+  for (uint8_t i = 0; i < (INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT) - ANALOG_INPUTS_COUNT + 1; i += ANALOG_INPUTS_COUNT)
+  {
+    for (uint8_t cv = 0; cv < ANALOG_INPUTS_COUNT; cv++)
+    {
+      state->inputCalibrations[i + cv].inputNumber = cv;
+      state->inputCalibrations[i + cv].voltage = voltage;
+      state->inputCalibrations[i + cv].adcValue = 100 * voltage;
+    }
+
+    voltage++;
+  }
 }
 
 void splash()
 {
   disp->clearDisplay();
 
-  disp->drawBitmap(0,0,epd_bitmap_peacock_bw, 128, 64, WHITE);
+  disp->drawBitmap(0, 0, epd_bitmap_peacock_bw, 128, 64, WHITE);
 
   disp->setCursor(0, 10);
   disp->setTextSize(1);
@@ -71,17 +89,11 @@ void setup()
   //  put your setup code here, to run once:
   Serial.begin(9600);
 
+  delay(2000);
   // Init the pins for I2C
   Wire.setSDA(PIN_I2C_SDA);
   Wire.setSCL(PIN_I2C_SCL);
 
-
-
-  // Init the pins for SPI
-  // SPI.setCS(13);
-  // SPI.setSCK(10);
-  // SPI.setTX(11);
-  // SPI.begin();
 
   // Init display
   disp = new Adafruit_SSD1306(128, 64, &Wire, -1, 800000 * 2, 100000);
@@ -92,15 +104,26 @@ void setup()
 
   splash();
 
+  EEPROM.begin(4096);
   initState();
 
-  Serial.println(sizeof(PicoEuroState_t));
+  // load state from EEPROM
+  loadStateInto(state);
 
-  EEPROM.begin(4096);
+  IOManager::getInstance()->initInputLinearRegression(state);
 
-  picoEuroUI = new PicoEuroUI(disp, state);
+  dumpInputCalibrations(state);
 
-  ui = picoEuroUI;
+  Serial.println(sizeof(PeacockState_t));
+
+  generalStateUI = new GeneralStateUI(disp, state);
+  inputCalibrationUI = new InputCalibrationUI(disp, state);
+
+  UIManager::getInstance()->uis[0] = generalStateUI;
+  UIManager::getInstance()->uis[1] = inputCalibrationUI;
+  UIManager::getInstance()->uiCount = 2;
+  //ui = generalStateUI;
+  //ui = inputCalibrationUI;
 
   isInitialized = true;
 }
@@ -108,16 +131,25 @@ void setup()
 void loop()
 {
   auto io = IOManager::getInstance();
+  auto ui = UIManager::getInstance();
+
   io->updateInputs();
 
-  bool isEncoderPressed = io->btnEnc->isPressed();
+  ui->currentUI()->handleButtons();
+  
+  if(io->btnEnc->pressed())
+  {
+    ui->next();
+  }
+
+  bool isEncoderPressed = true; // io->btnEnc->isPressed();
 
   // Serial.println(isEncoderPressed);
 
+  io->setGateOut0(isEncoderPressed);
   io->setGateOut1(isEncoderPressed);
   io->setGateOut2(isEncoderPressed);
   io->setGateOut3(isEncoderPressed);
-  io->setGateOut4(isEncoderPressed);
 
   // analog outputs test:
   int potValue = io->potValue;
@@ -127,5 +159,4 @@ void loop()
 
   io->dac->fastWriteA(dacOut);
   io->dac->fastWriteB(dacOut);
-
 }
