@@ -17,19 +17,20 @@ public:
         this->state = state;
     }
 
+    const char *id;
+
     virtual void draw() {}
     virtual void handleButtons() {}
 
     virtual void onEnter() {}
     virtual void onExit() {}
 
-/*
-    virtual void onBtnTopClick() {}
-    virtual void onBtnBottomClick() {}
-    virtual void onEncoderClick() {}
-    virtual void onEncoderChange(int delta, int rpm) {}
-*/
-
+    /*
+        virtual void onBtnTopClick() {}
+        virtual void onBtnBottomClick() {}
+        virtual void onEncoderClick() {}
+        virtual void onEncoderChange(int delta, int rpm) {}
+    */
 };
 
 #endif // ABSTRACT_UI_H

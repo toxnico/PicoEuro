@@ -14,7 +14,9 @@ private:
     uint16_t _currentADCValue = 0;
     float _currentVoltage = 0;
     DMTimer tmrBlinkTopButton;
-    bool _blinkLedStatus = 0;
+
+    Calibration_t tempCalibrations[INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT];
+    
 public:
     InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();    
@@ -24,6 +26,7 @@ public:
     void plot(uint8_t cvInput);
     
     void onExit();
+    void onEnter();
 
 };
 

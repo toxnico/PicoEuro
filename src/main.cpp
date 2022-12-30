@@ -7,6 +7,8 @@
 #include "peacock/peacock_state.h"
 #include "ui/general_state/general_state_ui.h"
 #include "ui/input_calibration/input_calibration_ui.h"
+#include "ui/output_calibration/output_calibration_ui.h"
+#include "ui/quantizer/quantizer_ui.h"
 #include "io/iomanager.h"
 #include "images/peacock_splash.h"
 #include "ui/uimanager.h"
@@ -15,10 +17,11 @@
 
 Adafruit_SSD1306 *disp = NULL;
 
-//AbstractUI *ui = NULL;
+// AbstractUI *ui = NULL;
 GeneralStateUI *generalStateUI = NULL;
 InputCalibrationUI *inputCalibrationUI = NULL;
-
+OutputCalibrationUI *outputCalibrationUI = NULL;
+QuantizerUI *quantizerUI = NULL;
 
 bool isInitialized = false;
 
@@ -40,7 +43,7 @@ void loop1()
   disp->clearDisplay();
 
   UIManager::getInstance()->currentUI()->draw();
-  
+
   // disp->fillRect(0,0,127,63,WHITE);
   disp->display();
   // needRedraw = false;
@@ -59,12 +62,27 @@ void initState()
   {
     for (uint8_t cv = 0; cv < ANALOG_INPUTS_COUNT; cv++)
     {
-      state->inputCalibrations[i + cv].inputNumber = cv;
+      state->inputCalibrations[i + cv].id = cv;
       state->inputCalibrations[i + cv].voltage = voltage;
-      state->inputCalibrations[i + cv].adcValue = 100 * voltage;
+      state->inputCalibrations[i + cv].digitalValue = 600 * voltage;
     }
 
     voltage++;
+  }
+
+  // init the output calibration values
+
+  int idx = 0;
+  for (uint8_t cv = 0; cv < ANALOG_OUTPUTS_COUNT; cv++)
+  {
+
+    for (uint8_t v = 0; v < OUTPUT_CALIBRATIONS_COUNT; v++)
+    {
+      state->outputCalibrations[idx].id = cv;
+      state->outputCalibrations[idx].voltage = v - 5;
+      state->outputCalibrations[idx].digitalValue = 100 * v;
+      idx++;
+    }
   }
 }
 
@@ -76,11 +94,30 @@ void splash()
 
   disp->setCursor(0, 10);
   disp->setTextSize(1);
-  disp->printf("PEACOCK\nv. %s", ABACUS_VERSION);
+  disp->printf("PEACOCK\nv. %s", PEACOCK_VERSION);
 
   disp->display();
 
   delay(SPLASH_DURATION);
+}
+
+/**
+ * @brief Instanciate all the UIs and init the UI Manager
+ *
+ */
+void initUIs()
+{
+  generalStateUI = new GeneralStateUI(disp, state);
+  inputCalibrationUI = new InputCalibrationUI(disp, state);
+  outputCalibrationUI = new OutputCalibrationUI(disp, state);
+  quantizerUI = new QuantizerUI(disp, state);
+
+  UIManager::getInstance()->uis[0] = generalStateUI;
+  UIManager::getInstance()->uis[1] = inputCalibrationUI;
+  UIManager::getInstance()->uis[2] = outputCalibrationUI;
+  UIManager::getInstance()->uis[3] = quantizerUI;
+
+  UIManager::getInstance()->uiCount = 4;
 }
 
 void setup()
@@ -89,11 +126,11 @@ void setup()
   //  put your setup code here, to run once:
   Serial.begin(9600);
 
-  delay(2000);
-  // Init the pins for I2C
+  // delay(2000);
+  //  Init the pins for I2C
+  
   Wire.setSDA(PIN_I2C_SDA);
   Wire.setSCL(PIN_I2C_SCL);
-
 
   // Init display
   disp = new Adafruit_SSD1306(128, 64, &Wire, -1, 800000 * 2, 100000);
@@ -110,20 +147,16 @@ void setup()
   // load state from EEPROM
   loadStateInto(state);
 
-  IOManager::getInstance()->initInputLinearRegression(state);
-
-  dumpInputCalibrations(state);
+  IOManager::getInstance()->initLinearRegressions(state);
 
   Serial.println(sizeof(PeacockState_t));
 
-  generalStateUI = new GeneralStateUI(disp, state);
-  inputCalibrationUI = new InputCalibrationUI(disp, state);
+  initUIs();
 
-  UIManager::getInstance()->uis[0] = generalStateUI;
-  UIManager::getInstance()->uis[1] = inputCalibrationUI;
-  UIManager::getInstance()->uiCount = 2;
-  //ui = generalStateUI;
-  //ui = inputCalibrationUI;
+  UIManager::getInstance()->activateById(UI_STARTUP);
+
+  // ui = generalStateUI;
+  // ui = inputCalibrationUI;
 
   isInitialized = true;
 }
@@ -136,8 +169,8 @@ void loop()
   io->updateInputs();
 
   ui->currentUI()->handleButtons();
-  
-  if(io->btnEnc->pressed())
+
+  if (io->btnEnc->pressed())
   {
     ui->next();
   }
@@ -155,8 +188,9 @@ void loop()
   int potValue = io->potValue;
 
   // just in case
-  int dacOut = constrain(potValue, 0, 4095);
+  // int dacOut = constrain(potValue, 0, 4095);
 
-  io->dac->fastWriteA(dacOut);
-  io->dac->fastWriteB(dacOut);
+  //io->setCVOut(2.5, 0);
+  // io->dac->fastWriteA(dacOut);
+  // io->dac->fastWriteB(dacOut);
 }

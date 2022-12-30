@@ -13,8 +13,9 @@ private:
 
     int _lastEncoderPosition = 0;
 
-    LinRegParams input0_linReg;
-    LinRegParams input1_linReg;
+    LinRegParams inputLinReg[ANALOG_INPUTS_COUNT];
+    LinRegParams outputLinReg[ANALOG_OUTPUTS_COUNT];
+    
     
 
 public:
@@ -59,13 +60,15 @@ public:
     void setGateOut2(bool state);
     void setGateOut3(bool state);
 
+    void setCVOut(float voltage, uint8_t channel);
+    void setCVOut0(float voltage);
+    void setCVOut1(float voltage);
+
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
+    void initLinearRegressions(PeacockState_t *state);
+    LinRegParams calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage);
 
     
-    
-
-    void initInputLinearRegression(PeacockState_t *state);
-    LinRegParams inputCalibrationValuesToLinRegParams(InputCalibration_t *cal, uint8_t count);
 };
 
 #endif // IOMANAGER_H

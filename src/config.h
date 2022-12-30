@@ -1,8 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define ABACUS_VERSION "0.1.2"
-#define SPLASH_DURATION 200
+#define PEACOCK_VERSION "0.1.3"
+#define SPLASH_DURATION 2000
+
+#define DONT_REALLY_SAVE_CALIBRATIONS 0
 
 #define ENCODER_DIRECTION -1
 
@@ -59,7 +61,16 @@
 
 //number of analog outputs
 #define ANALOG_OUTPUTS_COUNT 2
-//number of voltages calibrated on outputs
-#define OUTPUT_CALIBRATIONS_COUNT 5
+//number of voltages calibrated on outputs (-5V to +5V)
+#define OUTPUT_CALIBRATIONS_COUNT 11
 
+
+/* UI IDS */
+#define UI_GENERAL_STATE "GENERAL STATE"
+#define UI_INPUT_CALIBRATION "INPUT CALIBRATION"
+#define UI_OUTPUT_CALIBRATION "OUTPUT CALIBRATION"
+#define UI_QUANTIZER "QUANTIZER"
+
+
+#define UI_STARTUP UI_GENERAL_STATE
 #endif // CONFIG_H

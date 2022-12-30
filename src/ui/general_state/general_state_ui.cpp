@@ -6,11 +6,10 @@
 #include "io/iomanager.h"
 #include <MCP_DAC.h>
 
-
-
 GeneralStateUI::GeneralStateUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
     : AbstractUI(disp, state)
 {
+    this->id = UI_GENERAL_STATE;
 }
 
 void GeneralStateUI::draw()
@@ -24,14 +23,15 @@ void GeneralStateUI::draw()
 
     disp->println("PEACOCK TEST UI");
     disp->printf("ENCODER : %d\n", io->virtualEncoderPosition);
-    disp->printf("Pot value : %d\n", io->potValue);
-    disp->printf("CV IN : %d / %d\n", io->cvIn0, io->cvIn1);
-    disp->printf("CV IN MAX : %d / %d\n", io->maxCvIn0, io->maxCvIn1);
+    disp->printf("POT VALUE : %d\n", io->potValue);
+    disp->printf("CV IN: %.3f V/%.3f V\n", io->cvIn0_volts, io->cvIn1_volts);
+    //disp->printf("CV IN MAX : %d / %d\n", io->maxCvIn0, io->maxCvIn1);
 
-    disp->printf("GATES : %d / %d\n", io->gateIn0, io->gateIn1);
+    disp->printf("GATES : %d/%d\n", io->gateIn0, io->gateIn1);
 
     
-    disp->printf("CALIBR. VALID : %s\n", isSavedCalibrationValid() ? "YES" : "NO");
+    disp->printf("IN. CAL. VALID : %s\n", isSavedInputCalibrationValid() ? "YES" : "NO");
+    disp->printf("OUT. CAL. VALID : %s\n", isSavedOutputCalibrationValid() ? "YES" : "NO");
 
     if (io->btnTop->isPressed())
     {

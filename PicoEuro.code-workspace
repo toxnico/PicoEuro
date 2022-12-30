@@ -33,7 +33,8 @@
 			"*.tcc": "cpp",
 			"functional": "cpp",
 			"ranges": "cpp",
-			"streambuf": "cpp"
+			"streambuf": "cpp",
+			"cmath": "cpp"
 		}
 	}
 }

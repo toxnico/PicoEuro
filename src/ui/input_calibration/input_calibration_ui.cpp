@@ -2,14 +2,15 @@
 #include <Fonts/Org_01.h>
 
 #include "graphics/graphics.h"
-
 #include "io/iomanager.h"
+#include "ui/uimanager.h"
 #include <MCP_DAC.h>
 #include <EEPROM.h>
 
 InputCalibrationUI::InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
     : AbstractUI(disp, state)
 {
+    this->id = UI_INPUT_CALIBRATION;
     tmrBlinkTopButton.setInterval(500000);
 }
 
@@ -20,10 +21,10 @@ void InputCalibrationUI::draw()
     disp->setFont(&Org_01);
     disp->setCursor(0, 10);
 
+    //quick blink for the top button:
     static bool ledState = 0;
     if (tmrBlinkTopButton.isTimeReached())
     {
-        //_blinkLedStatus = !_blinkLedStatus;
         ledState = !ledState;
         io->setLedTop(ledState);
 
@@ -38,20 +39,17 @@ void InputCalibrationUI::draw()
         return;
     }
 
-    auto input = state->inputCalibrations[_currentInputBeingCalibrated];
+    auto input = tempCalibrations[_currentInputBeingCalibrated];
 
-    uint16_t x, y;
-    // x = 0;
-    // y = 20;
-
+    
     disp->setCursor(0, 10);
-    disp->printf("PUT %.0fV INTO CV %d\nAND PRESS THE\nBLINKING BUTTON\n", input.voltage, input.inputNumber);
+    disp->printf("PUT %.0fV INTO CV %d\nAND PRESS THE\nBLINKING BUTTON\n", input.voltage, input.id);
 
     // doing a switch in case we want to add more CV inputs
     _currentADCValue = 0;
     _currentVoltage = 0;
 
-    switch (input.inputNumber)
+    switch (input.id)
     {
     case 0:
         _currentADCValue = io->cvIn0;
@@ -73,19 +71,31 @@ void InputCalibrationUI::handleButtons()
     if (io->btnTop->pressed())
     {
         // update the ADC value for the current input/voltage:
-        state->inputCalibrations[_currentInputBeingCalibrated].adcValue = _currentADCValue;
+        tempCalibrations[_currentInputBeingCalibrated].digitalValue = _currentADCValue;
+        // state->inputCalibrations[_currentInputBeingCalibrated].adcValue = _currentADCValue;
 
         _currentInputBeingCalibrated++;
         if (_currentInputBeingCalibrated >= INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT)
         {
             // calibration is finished!
             _currentInputBeingCalibrated = -1;
+            
+#if DONT_REALLY_SAVE_CALIBRATIONS
+            UIManager::getInstance()->activateById(UI_GENERAL_STATE);
+            return;
+#else            
+
+            //we copy our temporary calibration data to the state's calibrations
+            memcpy(state->inputCalibrations, tempCalibrations, sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
 
             bool saved = saveState(state);
             if (saved)
                 Serial.println("Saved state !");
             else
                 Serial.println("Save error");
+            
+            UIManager::getInstance()->activateById(UI_GENERAL_STATE);
+#endif
         }
     }
 }
@@ -94,11 +104,11 @@ void InputCalibrationUI::plot(uint8_t cvInput)
 {
     for (uint8_t i = 0; i < INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT; i++)
     {
-        auto cal = state->inputCalibrations[i];
-        if (cal.inputNumber != cvInput)
+        auto cal = tempCalibrations[i];
+        if (cal.id != cvInput)
             continue;
 
-        auto x = map(cal.adcValue, 0, 4095, 0, 127);
+        auto x = map(cal.digitalValue, 0, 4095, 0, 127);
         auto y = 63 - map(cal.voltage, 0, 5, 0, 63);
 
         disp->drawPixel(x, y, WHITE);
@@ -108,4 +118,9 @@ void InputCalibrationUI::plot(uint8_t cvInput)
 void InputCalibrationUI::onExit()
 {
     this->_currentInputBeingCalibrated = -1;
+}
+
+void InputCalibrationUI::onEnter()
+{
+    memcpy(tempCalibrations, state->inputCalibrations, sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
 }
