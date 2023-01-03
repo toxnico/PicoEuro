@@ -42,4 +42,6 @@ bool isSavedOutputCalibrationValid();
 void initDefaultInputCalibrations(PeacockState_t *state);
 void initDefaultOutputCalibrations(PeacockState_t *state);
 
+int getDACvalue(float voltage, uint8_t channel, PeacockState_t *state);
+
 #endif // PEACOCK_STATE_H

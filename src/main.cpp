@@ -120,6 +120,15 @@ void initUIs()
   UIManager::getInstance()->uiCount = 4;
 }
 
+void onGate0Change()
+{
+  bool status = gpio_get(PIN_GATE_IN_0);
+  //Serial.printf("Gate 0 %s\n", (status ? "HIGH" : "LOW"));
+  float voltage = status ? 5:0;
+  IOManager::getInstance()->setGateOut0(status);
+  //IOManager::getInstance()->setCVOut(voltage, 1, state);
+}
+
 void setup()
 {
 
@@ -158,6 +167,8 @@ void setup()
   // ui = generalStateUI;
   // ui = inputCalibrationUI;
 
+  attachInterrupt(PIN_GATE_IN_0, onGate0Change, PinStatus::CHANGE);
+
   isInitialized = true;
 }
 
@@ -170,19 +181,18 @@ void loop()
 
   ui->currentUI()->handleButtons();
 
+
   if (io->btnEnc->pressed())
   {
     ui->next();
   }
 
-  bool isEncoderPressed = true; // io->btnEnc->isPressed();
-
-  // Serial.println(isEncoderPressed);
-
-  io->setGateOut0(isEncoderPressed);
-  io->setGateOut1(isEncoderPressed);
-  io->setGateOut2(isEncoderPressed);
-  io->setGateOut3(isEncoderPressed);
+  
+  //waiting for the correct front PCB :)
+  //io->setGateOut0(true);
+  io->setGateOut1(true);
+  io->setGateOut2(true);
+  io->setGateOut3(true);
 
   // analog outputs test:
   int potValue = io->potValue;

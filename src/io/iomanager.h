@@ -60,9 +60,7 @@ public:
     void setGateOut2(bool state);
     void setGateOut3(bool state);
 
-    void setCVOut(float voltage, uint8_t channel);
-    void setCVOut0(float voltage);
-    void setCVOut1(float voltage);
+    void setCVOut(float voltage, uint8_t channel, PeacockState_t *state);
 
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
     void initLinearRegressions(PeacockState_t *state);

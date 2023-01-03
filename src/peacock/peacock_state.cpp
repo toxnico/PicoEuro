@@ -94,6 +94,46 @@ bool isSavedOutputCalibrationValid()
     return tmp.outputCalibrations[2].voltage == -3;
 }
 
+int getDACvalue(float voltage, uint8_t channel, PeacockState_t *state)
+{
+    // retrieve the calibration elements for the desired channel:
+    Calibration_t calibrationsForThisChannel[OUTPUT_CALIBRATIONS_COUNT];
+    getCalibrationsFor(channel, state->outputCalibrations, OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT, calibrationsForThisChannel, OUTPUT_CALIBRATIONS_COUNT);
+
+    for (uint8_t i = 0; i < OUTPUT_CALIBRATIONS_COUNT - 1; i++)
+    {
+        // we take 2 adjacent calibrations and check if the desired voltage is between these:
+        Calibration_t cal1 = calibrationsForThisChannel[i];
+        Calibration_t cal2 = calibrationsForThisChannel[i + 1];
+
+        if (voltage >= cal1.voltage && voltage <= cal2.voltage)
+        {
+            // compute the equation of the line: slope = (y2-y1)/(x2-x1)
+            float a = (float)(cal2.digitalValue - cal1.digitalValue) / (cal2.voltage - cal1.voltage);
+
+            // ordinate at the origin : the b in y = a*x + b => b = y - (a*x)
+            float b = cal2.digitalValue - (a * cal2.voltage);
+
+            //Yeepee, we have our y = ax+b !
+            //Let's compute the DAC value for the provided voltage:
+            int dacValue = (int)(a * voltage + b);
+
+            //Serial.printf("y = %.3f x + %.3f\n", a, b);
+
+            return dacValue;
+            
+        }
+    }
+    //extreme cases :
+    if(voltage < calibrationsForThisChannel[0].voltage)
+        return 0;
+    if(voltage > calibrationsForThisChannel[OUTPUT_CALIBRATIONS_COUNT-1].voltage)
+        return 4095;
+
+    //we should never get here:
+    return -1;
+}
+
 void initDefaultInputCalibrations(PeacockState_t *state)
 {
     state->inputCalibrations[0].id = 0;

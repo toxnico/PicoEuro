@@ -54,6 +54,9 @@ IOManager::IOManager()
     pinMode(PIN_GATE_OUT_1, OUTPUT);
     pinMode(PIN_GATE_OUT_2, OUTPUT);
     pinMode(PIN_GATE_OUT_3, OUTPUT);
+
+    pinMode(PIN_GATE_IN_0, INPUT);
+    pinMode(PIN_GATE_IN_1, INPUT);
 }
 
 /**
@@ -81,10 +84,10 @@ void IOManager::updateInputs()
     this->potValue = analogReadAverage(PIN_POT, ANALOG_READ_SAMPLE_COUNT);
     this->cvIn0 = analogReadAverage(PIN_CV_IN_0, ANALOG_READ_SAMPLE_COUNT);
     this->cvIn1 = analogReadAverage(PIN_CV_IN_1, ANALOG_READ_SAMPLE_COUNT);
-
     // convert the ADC values into volts, using the calibration data
     this->cvIn0_volts = this->inputLinReg[0].a * (float)this->cvIn0 + this->inputLinReg[0].b;
     this->cvIn1_volts = this->inputLinReg[1].a * (float)this->cvIn1 + this->inputLinReg[1].b;
+
 
     // to display the CV input blank values:
     if (this->cvIn0 > this->maxCvIn0)
@@ -93,8 +96,8 @@ void IOManager::updateInputs()
         this->maxCvIn1 = this->cvIn1;
 
     // gates in:
-    gateIn0 = digitalRead(PIN_GATE_IN_0);
-    gateIn1 = digitalRead(PIN_GATE_IN_1);
+    //gateIn0 = digitalRead(PIN_GATE_IN_0);
+    //gateIn1 = digitalRead(PIN_GATE_IN_1);
 }
 
 void IOManager::setLedLeft(bool state)
@@ -132,6 +135,15 @@ void IOManager::setGateOut3(bool state)
     digitalWrite(PIN_GATE_OUT_3, !state);
 }
 
+void IOManager::setCVOut(float voltage, uint8_t channel, PeacockState_t *state)
+{
+    auto dacValue = getDACvalue(voltage, channel, state);
+
+    dac->analogWrite(dacValue, channel);
+
+}
+
+/*
 void IOManager::setCVOut(float voltage, uint8_t channel)
 {
     float dacValue = outputLinReg[channel].a * voltage + outputLinReg[channel].b;
@@ -146,7 +158,7 @@ void IOManager::setCVOut1(float voltage)
 {
     setCVOut(voltage, 1);
 }
-
+*/
 uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)
 {
     uint32_t sum = 0;
@@ -157,6 +169,7 @@ uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)
     }
     return sum / sampleCount;
 }
+
 
 LinRegParams IOManager::calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage)
 {
@@ -177,6 +190,8 @@ LinRegParams IOManager::calibrationValuesToLinRegParams(Calibration_t *cal, uint
     }
     return computeLinReg(points, count);
 }
+
+
 void IOManager::initLinearRegressions(PeacockState_t *state)
 {
     uint8_t count;
