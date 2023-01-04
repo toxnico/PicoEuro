@@ -48,7 +48,7 @@
 #define LONG_PRESS_DELAY 2000
 
 //for input multisampling
-#define ANALOG_READ_SAMPLE_COUNT 20
+#define ANALOG_READ_SAMPLE_COUNT 21
 
 #define MAX_UI_COUNT 10
 

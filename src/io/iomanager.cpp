@@ -1,7 +1,7 @@
 #include "iomanager.h"
 #include "config.h"
 #include <EEPROM.h>
-
+#include <math.h>
 IOManager *IOManager::_instance = NULL;
 
 /**
@@ -88,6 +88,8 @@ void IOManager::updateInputs()
     this->cvIn0_volts = this->inputLinReg[0].a * (float)this->cvIn0 + this->inputLinReg[0].b;
     this->cvIn1_volts = this->inputLinReg[1].a * (float)this->cvIn1 + this->inputLinReg[1].b;
 
+    // DEBUG ONLY !
+    //cvIn0_volts = (float)map(potValue, 0, 4095, 0, 5000) / 1000.0;
 
     // to display the CV input blank values:
     if (this->cvIn0 > this->maxCvIn0)
@@ -96,8 +98,8 @@ void IOManager::updateInputs()
         this->maxCvIn1 = this->cvIn1;
 
     // gates in:
-    //gateIn0 = digitalRead(PIN_GATE_IN_0);
-    //gateIn1 = digitalRead(PIN_GATE_IN_1);
+    // gateIn0 = digitalRead(PIN_GATE_IN_0);
+    // gateIn1 = digitalRead(PIN_GATE_IN_1);
 }
 
 void IOManager::setLedLeft(bool state)
@@ -140,7 +142,6 @@ void IOManager::setCVOut(float voltage, uint8_t channel, PeacockState_t *state)
     auto dacValue = getDACvalue(voltage, channel, state);
 
     dac->analogWrite(dacValue, channel);
-
 }
 
 /*
@@ -149,7 +150,7 @@ void IOManager::setCVOut(float voltage, uint8_t channel)
     float dacValue = outputLinReg[channel].a * voltage + outputLinReg[channel].b;
     dac->analogWrite(dacValue, 0);
 }
-
+2048
 void IOManager::setCVOut0(float voltage)
 {
     setCVOut(voltage, 0);
@@ -170,6 +171,40 @@ uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)
     return sum / sampleCount;
 }
 
+int comparator(const void *a, const void *b)
+{
+    int *ia = (int *)a;
+    int *ib = (int *)b;
+
+    if (*ia == *ib)
+        return 0;
+    return *ia < *ib ? -1 : 1;
+}
+
+uint16_t IOManager::analogReadMedian(uint8_t pin, uint8_t sampleCount)
+{
+    int arr[sampleCount];
+
+    // uint32_t sum = 0;
+    //Serial.printf("ORIG: ");
+    for (uint8_t i = 0; i < sampleCount; i++)
+    {
+        arr[i] = analogRead(pin);
+        //Serial.printf("%d, ", arr[i]);
+    }
+    Serial.println();
+
+    //Serial.printf("SORT: ");
+    qsort(arr, sampleCount, sizeof(int), comparator);
+
+    for (uint8_t i = 0; i < sampleCount; i++)
+        Serial.printf("%d, ", arr[i]);
+    
+    Serial.println();
+
+    int index = floor(sampleCount/2) +1;
+    return arr[index];
+}
 
 LinRegParams IOManager::calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage)
 {
@@ -190,7 +225,6 @@ LinRegParams IOManager::calibrationValuesToLinRegParams(Calibration_t *cal, uint
     }
     return computeLinReg(points, count);
 }
-
 
 void IOManager::initLinearRegressions(PeacockState_t *state)
 {

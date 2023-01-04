@@ -48,10 +48,44 @@ void QuantizerUI::draw()
     // disp->printf("OUTPUT 0: %.3f V\n", outputVoltage);
 
     // disp->printf("%.2f,%.2f,%.2f,%.2f,%.2f", voltages[])
-    drawGraphicScale();
+    drawGauge(127-9);
 }
 
-void QuantizerUI::drawGraphicScale()
+void QuantizerUI::drawGauge(uint16_t x)
+{
+    auto io = IOManager::getInstance();
+
+    uint16_t left = x;
+    uint16_t bottom = 63;
+    uint16_t boxWidth = 9;
+    uint16_t gaugeWidth = 4;
+    const uint16_t voltFractionToScreenY = 1536 * 5 / 128; // == 60 :)
+    uint16_t top = voltFractionToScreenY;
+
+    disp->drawRect(left, bottom - top, boxWidth, top, WHITE);
+
+    auto v = io->cvIn0_volts;
+    v -= floor(v); // keep only the decimal part
+
+    // drawArrowHorizontal(left - 6, bottom - v * voltFractionToScreenY);
+
+    // gauge level :
+    disp->fillRect(left + (boxWidth - gaugeWidth), bottom - v * voltFractionToScreenY, gaugeWidth, v * voltFractionToScreenY, WHITE);
+
+    for (int i = 0; i < this->currentScale().num_notes; i++)
+    {
+        auto y = voltages[i] * voltFractionToScreenY;
+
+        disp->drawLine(left, bottom - y, left + boxWidth - 1, bottom - y, WHITE);
+    }
+
+    // display the quantified value :
+    float q = rawVoltageToQuantizedVoltage(v);
+    int tickY = bottom - q * voltFractionToScreenY;
+    disp->fillTriangle(left - 4, tickY, left, tickY - 4, left, tickY + 4, WHITE);
+}
+
+void QuantizerUI::drawGraphicScaleVertical()
 {
     auto io = IOManager::getInstance();
 
@@ -64,11 +98,7 @@ void QuantizerUI::drawGraphicScale()
     auto v = io->cvIn0_volts;
     v -= floor(v); // keep only the decimal part
 
-    // convert this to a vertical screen coordinate:
-    // v = (v * 1536) * 5 / 128;
-
-    //disp->drawLine(left - 4, bottom - v * voltFractionToScreenY, left - 1, bottom - v * voltFractionToScreenY, WHITE);
-    drawArrow(left - 6, bottom - v * voltFractionToScreenY);
+    drawArrowHorizontal(left - 6, bottom - v * voltFractionToScreenY);
     for (int i = 0; i < this->currentScale().num_notes; i++)
     {
         auto y = voltages[i] * voltFractionToScreenY;
@@ -79,15 +109,62 @@ void QuantizerUI::drawGraphicScale()
     // display the quantified value :
     float q = rawVoltageToQuantizedVoltage(v);
 
-    drawArrow(left +width + 2, bottom - q * voltFractionToScreenY);
-    //disp->drawLine(left + width + 2, bottom - q * voltFractionToScreenY, left + width + 5, bottom - q * voltFractionToScreenY, WHITE);
+    drawArrowHorizontal(left + width + 2, bottom - q * voltFractionToScreenY);
+    // disp->drawLine(left + width + 2, bottom - q * voltFractionToScreenY, left + width + 5, bottom - q * voltFractionToScreenY, WHITE);
 }
 
-void QuantizerUI::drawArrow(uint16_t x, uint16_t y){
+void QuantizerUI::drawGraphicScaleHorizontal()
+{
+    auto io = IOManager::getInstance();
+
+    int left = 0;
+    int top = 48;
+    // int bottom = 63;
+    int height = 8;
+
+    const int voltFractionToScreenY = 1536 * 10 / 128; // 10 pixels per semitone.
+
+    auto v = io->cvIn0_volts;
+
+    if (v > 0.6)
+    {
+        Serial.println("HOP");
+        Serial.printf("%.3f volts");
+        Serial.println();
+    }
+
+    v -= floor(v); // keep only the decimal part
+
+    drawArrowVertical(v * voltFractionToScreenY, top - 8);
+    for (int i = 0; i < this->currentScale().num_notes; i++)
+    {
+        auto x = voltages[i] * voltFractionToScreenY;
+
+        disp->drawLine(x, top, x, top + height, WHITE);
+    }
+
+    // display the quantified value :
+    float q = rawVoltageToQuantizedVoltage(v);
+
+    drawArrowVertical(q * voltFractionToScreenY, top + height + 2);
+    // drawArrowVertical(left +width + 2, bottom - q * voltFractionToScreenY);
+    // disp->drawLine(left + width + 2, bottom - q * voltFractionToScreenY, left + width + 5, bottom - q * voltFractionToScreenY, WHITE);
+}
+
+void QuantizerUI::drawArrowVertical(uint16_t x, uint16_t y)
+{
     uint16_t len = 5;
-    disp->drawLine(x,y,x+len, y, WHITE);
-    disp->drawLine(x+len,y,x+len-3, y-3, WHITE);
-    disp->drawLine(x+len,y,x+len-3, y+3, WHITE);
+    disp->drawLine(x, y, x, y + len, WHITE);
+    disp->drawLine(x - 3, y + len - 3, x, y + len, WHITE);
+    disp->drawLine(x + 3, y + len - 3, x, y + len, WHITE);
+}
+
+void QuantizerUI::drawArrowHorizontal(uint16_t x, uint16_t y)
+{
+    uint16_t len = 5;
+    disp->drawLine(x, y, x + len, y, WHITE);
+    disp->drawLine(x + len, y, x + len - 3, y - 3, WHITE);
+    disp->drawLine(x + len, y, x + len - 3, y + 3, WHITE);
 }
 
 float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
@@ -137,7 +214,7 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 
     if (upperDelta < lowerDelta)
     {
-        return octave+1;
+        return octave + 1;
     }
     else
     {

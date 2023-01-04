@@ -63,6 +63,7 @@ public:
     void setCVOut(float voltage, uint8_t channel, PeacockState_t *state);
 
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
+    uint16_t analogReadMedian(uint8_t pin, uint8_t sampleCount);
     void initLinearRegressions(PeacockState_t *state);
     LinRegParams calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage);
 
