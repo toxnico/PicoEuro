@@ -25,6 +25,9 @@ public:
     Bounce2::Button *btnTop = NULL;
     Bounce2::Button *btnBottom = NULL;
 
+    Bounce *gateIn0 = NULL;
+    Bounce *gateIn1 = NULL;
+
     RotaryEncoder *enc = NULL;
 
     MCP4922 *dac = NULL;
@@ -32,18 +35,15 @@ public:
     int virtualEncoderPosition = 0;
     int potValue = 0;
 
-    //uint16_t cvIn0 = 0;
-    //uint16_t cvIn1 = 0;
     uint16_t cvIn[ANALOG_INPUTS_COUNT];
-    //float cvIn0_volts = 0;
-    //float cvIn1_volts = 0;
+
     float cvInVolts[ANALOG_INPUTS_COUNT];
 
     uint16_t maxCvIn0 = 0;
     uint16_t maxCvIn1 = 0;
 
-    uint8_t gateIn0 = 0;
-    uint8_t gateIn1 = 0;
+    //uint8_t gateIn0 = 0;
+    //uint8_t gateIn1 = 0;
 
     // methods
 

@@ -2,6 +2,7 @@
 #include "config.h"
 #include <EEPROM.h>
 #include <math.h>
+
 IOManager *IOManager::_instance = NULL;
 
 /**
@@ -37,6 +38,12 @@ IOManager::IOManager()
     btnTop->setPressedState(LOW);
     btnBottom->setPressedState(LOW);
 
+    // Create the 2 gates:
+    gateIn0 = new Bounce();
+    gateIn1 = new Bounce();
+    gateIn0->attach(PIN_GATE_IN_0, INPUT_PULLDOWN);
+    gateIn1->attach(PIN_GATE_IN_1, INPUT_PULLDOWN);
+
     // encoder init
     enc = new RotaryEncoder(PIN_ENC_A, PIN_ENC_B, RotaryEncoder::LatchMode::FOUR3);
 
@@ -55,8 +62,6 @@ IOManager::IOManager()
     pinMode(PIN_GATE_OUT_2, OUTPUT);
     pinMode(PIN_GATE_OUT_3, OUTPUT);
 
-    pinMode(PIN_GATE_IN_0, INPUT);
-    pinMode(PIN_GATE_IN_1, INPUT);
 }
 
 /**
@@ -71,42 +76,31 @@ void IOManager::updateInputs()
     btnTop->update();
     btnBottom->update();
 
+    gateIn0->update();
+    gateIn1->update();
+
     // encoder
     enc->tick();
-    /*int dir = (int)enc->getDirection();
-    if (dir != 0)
-    {
-        virtualEncoderPosition += dir * ENCODER_DIRECTION;
-    }*/
 
     // analog inputs:
-
     this->potValue = analogReadAverage(PIN_POT, ANALOG_READ_SAMPLE_COUNT);
     this->cvIn[0] = analogReadAverage(PIN_CV_IN_0, ANALOG_READ_SAMPLE_COUNT);
     this->cvIn[1] = analogReadAverage(PIN_CV_IN_1, ANALOG_READ_SAMPLE_COUNT);
     // convert the ADC values into volts, using the calibration data
 
-    #if USE_POT_AS_QUANTIZER_INPUT
+#if USE_POT_AS_QUANTIZER_INPUT
     cvInVolts[0] = (float)map(potValue, 0, 4095, 0, 5000) / 1000.0;
     cvInVolts[1] = (float)map(potValue, 0, 4095, 0, 5000) / 1000.0;
-    //Serial.println(cvInVolts[0]);
-    //Serial.println(potValue);
-
-    #else
+#else
     this->cvInVolts[0] = this->inputLinReg[0].a * (float)this->cvIn[0] + this->inputLinReg[0].b;
     this->cvInVolts[1] = this->inputLinReg[1].a * (float)this->cvIn[1] + this->inputLinReg[1].b;
-    #endif
-    // DEBUG ONLY !
+#endif
 
     // to display the CV input blank values:
     if (this->cvIn[0] > this->maxCvIn0)
         this->maxCvIn0 = this->cvIn[0];
     if (this->cvIn[1] > this->maxCvIn1)
         this->maxCvIn1 = this->cvIn[1];
-
-    // gates in:
-    // gateIn0 = digitalRead(PIN_GATE_IN_0);
-    // gateIn1 = digitalRead(PIN_GATE_IN_1);
 }
 
 void IOManager::setLedLeft(bool state)
@@ -193,23 +187,23 @@ uint16_t IOManager::analogReadMedian(uint8_t pin, uint8_t sampleCount)
     int arr[sampleCount];
 
     // uint32_t sum = 0;
-    //Serial.printf("ORIG: ");
+    // Serial.printf("ORIG: ");
     for (uint8_t i = 0; i < sampleCount; i++)
     {
         arr[i] = analogRead(pin);
-        //Serial.printf("%d, ", arr[i]);
+        // Serial.printf("%d, ", arr[i]);
     }
     Serial.println();
 
-    //Serial.printf("SORT: ");
+    // Serial.printf("SORT: ");
     qsort(arr, sampleCount, sizeof(int), comparator);
 
     for (uint8_t i = 0; i < sampleCount; i++)
         Serial.printf("%d, ", arr[i]);
-    
+
     Serial.println();
 
-    int index = floor(sampleCount/2) +1;
+    int index = floor(sampleCount / 2) + 1;
     return arr[index];
 }
 

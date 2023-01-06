@@ -120,6 +120,7 @@ void initUIs()
   UIManager::getInstance()->uiCount = 4;
 }
 
+/*
 void onGate0Change()
 {
   bool status = gpio_get(PIN_GATE_IN_0);
@@ -128,7 +129,7 @@ void onGate0Change()
   IOManager::getInstance()->setGateOut0(status);
   //IOManager::getInstance()->setCVOut(voltage, 1, state);
 }
-
+*/
 void setup()
 {
 
@@ -164,10 +165,8 @@ void setup()
 
   UIManager::getInstance()->activateById(UI_STARTUP);
 
-  // ui = generalStateUI;
-  // ui = inputCalibrationUI;
 
-  attachInterrupt(PIN_GATE_IN_0, onGate0Change, PinStatus::CHANGE);
+  //attachInterrupt(PIN_GATE_IN_0, onGate0Change, PinStatus::CHANGE);
 
   isInitialized = true;
 }
@@ -189,10 +188,10 @@ void loop()
 
   
   //waiting for the correct front PCB :)
-  //io->setGateOut0(true);
-  //io->setGateOut1(true);
-  //io->setGateOut2(true);
-  //io->setGateOut3(true);
+  io->setGateOut0(true);
+  io->setGateOut1(true);
+  io->setGateOut2(true);
+  io->setGateOut3(true);
 
   // analog outputs test:
   int potValue = io->potValue;

@@ -27,7 +27,7 @@ void GeneralStateUI::draw()
     disp->printf("CV IN: %.3f V/%.3f V\n", io->cvInVolts[0], io->cvInVolts[1]);
     //disp->printf("CV IN MAX : %d / %d\n", io->maxCvIn0, io->maxCvIn1);
 
-    disp->printf("GATES : %d/%d\n", io->gateIn0, io->gateIn1);
+    disp->printf("GATES : %d/%d\n", io->gateIn0->read(), io->gateIn1->read());
 
     
     disp->printf("IN. CAL. VALID : %s\n", isSavedInputCalibrationValid() ? "YES" : "NO");
@@ -54,7 +54,7 @@ void GeneralStateUI::draw()
         io->setLedBottom(false);
         io->setLedRight(false);
     }
-    
+
     //tests for the 4 gates :
     io->setGateOut0(io->btnBottom->isPressed());
     io->setGateOut1(io->btnBottom->isPressed());

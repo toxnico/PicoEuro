@@ -24,6 +24,8 @@ void UIManager::next()
     if (nextIdx > this->uiCount - 1)
         nextIdx = 0;
 
+  // ui = generalStateUI;
+  // ui = inputCalibrationUI;
     auto id = this->uis[nextIdx]->id;
     activateById(id);
 }

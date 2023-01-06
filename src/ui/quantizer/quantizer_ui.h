@@ -29,7 +29,7 @@ public:
     void draw();
     void drawGauge(uint16_t x, float voltage, int arrowDirection);
     void handleIO();
-
+    void updateCVOut(uint8_t idx);
     void onExit();
     void onEnter();
 

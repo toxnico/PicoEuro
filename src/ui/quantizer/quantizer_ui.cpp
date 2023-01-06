@@ -63,7 +63,7 @@ void QuantizerUI::draw()
         disp->setTextSize(2);
         char buff[4];
         sprintf(buff, "+%d", octave);
-        Graphics::printRightAligned(disp, buff, 110, 62);
+        Graphics::printRightAligned(disp, buff, 24, 62);
         
     }
 
@@ -71,7 +71,7 @@ void QuantizerUI::draw()
     if(octave > 0)
     {
         disp->setTextSize(2);
-        disp->setCursor(15, 62);
+        disp->setCursor(90, 62);
         disp->printf("+%d", octave);
         
     }
@@ -92,11 +92,8 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, int arrowDirection)
 
     disp->drawRect(left, bottom - top, boxWidth, top, WHITE);
 
-    //auto v = io->cvInVolts[0];
     int octave = floor(voltage);
     voltage -= octave; // keep only the decimal part for display (the scale is on 1 octave only)
-
-    
 
     for (int i = 0; i < this->currentScale().num_notes; i++)
     {
@@ -125,7 +122,12 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, int arrowDirection)
     }
 }
 
-
+/**
+ * @brief Takes a voltage, and returns a quantified value according to the internal voltages[] array
+ * 
+ * @param rawVoltage 
+ * @return float 
+ */
 float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 {
     // no scale :
@@ -198,13 +200,38 @@ void QuantizerUI::handleIO()
 
     auto start = micros();
 
-    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[0]);
-    io->setCVOut(outputVoltage, 0, state);
+    if(ENABLE_SAMPLE_AND_HOLD)
+    {
+        if(io->gateIn0->rose())
+            updateCVOut(0);
+        if(io->gateIn1->rose())
+            updateCVOut(1);
+    }
+    else
+    {
+        updateCVOut(0);
+        updateCVOut(1);
+    }
+
+    //float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[0]);
+    //io->setCVOut(outputVoltage, 0, state);
 
     auto end = micros();
 
     _lastConversionDuration_us = end - start;
 
+}
+
+/**
+ * @brief Reads analog input at index idx, quantizes it and applies the quantized voltage to the output at index idx
+ * 
+ * @param idx 
+ */
+void QuantizerUI::updateCVOut(uint8_t idx)
+{
+    auto io = IOManager::getInstance();
+    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[idx]);
+    io->setCVOut(outputVoltage, idx, state);
 }
 
 void QuantizerUI::onExit()

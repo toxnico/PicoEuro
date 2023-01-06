@@ -1,14 +1,24 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define PEACOCK_VERSION "0.1.4"
+#define PEACOCK_VERSION "0.1.5"
 #define SPLASH_DURATION 2000
 
+//helpful to debug the calibration UIs, without writing to the flash memory for real
 #define DONT_REALLY_SAVE_CALIBRATIONS 0
-//#define USE_POT_AS_QUANTIZER_INPUT 1
 
+// For development purpose : replaces both CV inputs with the pot value, mapped between 0 and +5v
+#define USE_POT_AS_QUANTIZER_INPUT 0
+
+// Enables the sample & hold feature in the quantizer:
+// a trigger must be sent to gate input 0 or 1 in order to update the CV output
+#define ENABLE_SAMPLE_AND_HOLD 0
+
+// Depending on the encoder, it could be helpful to reverse this : 1 or -1
 #define ENCODER_DIRECTION -1
 
+
+/* PIN DEFINITIONS */
 #define PIN_ENC_A 1
 #define PIN_ENC_B 2
 #define PIN_BTN_ENC (uint8_t)0
@@ -44,14 +54,16 @@
 #define PIN_SPI_MOSI 11
 #define PIN_SPI_CS 13
 
+// to handle rotation speed of the encoder (in RPM)
 #define ENCODER_SPEED_THRESHOLD 300
-#define CLICK_DELAY 300
-#define LONG_PRESS_DELAY 2000
+//#define CLICK_DELAY 300
+//#define LONG_PRESS_DELAY 2000
 
-//for input multisampling
+// for input multisampling
 #define ANALOG_READ_SAMPLE_COUNT 21
 
-#define MAX_UI_COUNT 10
+//we may want to increase this if there are more than 32 different user interfaces !
+#define MAX_UI_COUNT 32
 
 /* CALIBRATION STUFF */
 
@@ -73,6 +85,8 @@
 #define UI_QUANTIZER "QUANTIZER"
 
 
-#define UI_STARTUP UI_GENERAL_STATE
-//#define UI_STARTUP UI_QUANTIZER
+//This is the UI we want to load at startup:
+//#define UI_STARTUP UI_GENERAL_STATE
+#define UI_STARTUP UI_QUANTIZER
+
 #endif // CONFIG_H
