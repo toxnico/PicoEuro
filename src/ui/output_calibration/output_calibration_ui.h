@@ -11,7 +11,7 @@ private:
     int8_t _currentOutputBeingCalibrated = 0;
     int16_t _currentDigitalValue = 0;
     //float _currentVoltage = 0;
-    DMTimer tmrBlinkTopButton;
+    DMTimer tmrBlinkButton;
 
     Calibration_t tempCalibrations[OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT];
 
@@ -19,7 +19,7 @@ public:
     OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();
 
-    void handleButtons();
+    void handleIO();
 
     void plot(uint8_t cvInput);
 

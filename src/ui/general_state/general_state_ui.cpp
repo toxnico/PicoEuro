@@ -24,7 +24,7 @@ void GeneralStateUI::draw()
     disp->println("PEACOCK TEST UI");
     disp->printf("ENCODER : %d\n", io->virtualEncoderPosition);
     disp->printf("POT VALUE : %d\n", io->potValue);
-    disp->printf("CV IN: %.3f V/%.3f V\n", io->cvIn0_volts, io->cvIn1_volts);
+    disp->printf("CV IN: %.3f V/%.3f V\n", io->cvInVolts[0], io->cvInVolts[1]);
     //disp->printf("CV IN MAX : %d / %d\n", io->maxCvIn0, io->maxCvIn1);
 
     disp->printf("GATES : %d/%d\n", io->gateIn0, io->gateIn1);
@@ -54,7 +54,12 @@ void GeneralStateUI::draw()
         io->setLedBottom(false);
         io->setLedRight(false);
     }
-
+    
+    //tests for the 4 gates :
+    io->setGateOut0(io->btnBottom->isPressed());
+    io->setGateOut1(io->btnBottom->isPressed());
+    io->setGateOut2(io->btnBottom->isPressed());
+    io->setGateOut3(io->btnBottom->isPressed());
 
     //we enable the leds only if the encoder is pressed:
     /*if (io->btnEnc->isPressed())

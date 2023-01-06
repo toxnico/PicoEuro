@@ -12,7 +12,7 @@ OutputCalibrationUI::OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t 
     : AbstractUI(disp, state)
 {
     this->id = UI_OUTPUT_CALIBRATION;
-    tmrBlinkTopButton.setInterval(500000);
+    tmrBlinkButton.setInterval(500000);
 }
 
 void OutputCalibrationUI::draw()
@@ -24,13 +24,13 @@ void OutputCalibrationUI::draw()
 
     // quick blink for the top button:
     static bool ledState = 0;
-    if (tmrBlinkTopButton.isTimeReached())
+    if (tmrBlinkButton.isTimeReached())
     {
         ledState = !ledState;
-        io->setLedTop(ledState);
+        io->setLedBottom(ledState);
 
-        tmrBlinkTopButton.setInterval(ledState ? 10000 : 1000000);
-        tmrBlinkTopButton.reset();
+        tmrBlinkButton.setInterval(ledState ? 10000 : 1000000);
+        tmrBlinkButton.reset();
     }
 
     if (_currentOutputBeingCalibrated < 0)
@@ -48,7 +48,7 @@ void OutputCalibrationUI::draw()
     disp->printf("\nDAC VALUE: %d\nTARGET VOLTAGE: %d V", _currentDigitalValue, (int)cal.voltage);
 }
 
-void OutputCalibrationUI::handleButtons()
+void OutputCalibrationUI::handleIO()
 {
     auto io = IOManager::getInstance();
 
@@ -63,7 +63,7 @@ void OutputCalibrationUI::handleButtons()
     io->dac->analogWrite(this->_currentDigitalValue, cal.id);
 
     // validate the current voltage/output calibration
-    if (io->btnTop->pressed())
+    if (io->btnBottom->pressed())
     {
         // update the ADC value for the current input/voltage:
         tempCalibrations[_currentOutputBeingCalibrated].digitalValue = _currentDigitalValue;

@@ -14,7 +14,7 @@ public:
     
     
     void draw();
-    void handleButtons();
+    void handleIO();
     void onEnter();
     void onExit();
 

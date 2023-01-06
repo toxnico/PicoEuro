@@ -27,12 +27,8 @@ private:
 public:
     QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();
-    void drawGraphicScaleVertical();
-    void drawGraphicScaleHorizontal();
-    void drawGauge(uint16_t x);
-    void drawArrowHorizontal(uint16_t x, uint16_t y);
-    void drawArrowVertical(uint16_t x, uint16_t y);
-    void handleButtons();
+    void drawGauge(uint16_t x, float voltage, int arrowDirection);
+    void handleIO();
 
     void onExit();
     void onEnter();

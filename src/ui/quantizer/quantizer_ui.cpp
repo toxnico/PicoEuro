@@ -19,6 +19,7 @@ void QuantizerUI::draw()
     auto io = IOManager::getInstance();
 
     disp->setFont(&Org_01);
+    disp->setTextSize(1);
     disp->setCursor(0, 10);
 
     auto name = scale_names[_currentScaleIndex];
@@ -29,29 +30,56 @@ void QuantizerUI::draw()
     {
         scaleName[i] = toUpperCase(scaleName[i]);
     }
-    disp->printf("SCALE: %s\n\n", scaleName);
+    
+    //scale name is centered horizontally:
+    auto w = Graphics::getTextWidth(scaleName, disp);
+    disp->setCursor((128-w) / 2, 10);
+    disp->print(scaleName);
+    
+    uint16_t voltagesY = 30;
+    //channel 0:
+    disp->setCursor(15, voltagesY);
+    disp->printf("%.3f V", io->cvInVolts[0]);
+    disp->setCursor(15, voltagesY+8);
+    disp->printf("%.3f V", rawVoltageToQuantizedVoltage(io->cvInVolts[0]));
+    
+    //channel 1:
+    char buff[10];
+    //Graphics::printRightAligned(disp, )
+    disp->setCursor(78, voltagesY);
+    disp->printf("%.3f V", io->cvInVolts[1]);
+    disp->setCursor(78, voltagesY+8);
+    disp->printf("%.3f V", rawVoltageToQuantizedVoltage(io->cvInVolts[1]));
+    
+    //Gauges
+    drawGauge(0, io->cvInVolts[0], 1);
 
-    disp->printf("IN: %.3f v\n", io->cvIn0_volts);
+    drawGauge(118, io->cvInVolts[1], -1);
 
-    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvIn0_volts);
-    disp->printf("OUT: %.3f v\n", outputVoltage);
-    // disp->printf("Conversion time : %d", (int)_lastConversionDuration_us);
-    //  disp->printf("Octave: %.1f\n", _currentOctave);
-    //  auto dacValue = getDACvalue(_currentOctave, 0, state);
-    //  disp->printf("Octave: %d\n", dacValue);
+    //draw the current octave (quantized) :
+    int octave = floor(io->cvInVolts[0]);
+    if(octave > 0)
+    {
+        disp->setTextSize(2);
+        char buff[4];
+        sprintf(buff, "+%d", octave);
+        Graphics::printRightAligned(disp, buff, 110, 62);
+        
+    }
 
-    // disp->printf("INPUT 0: %.2f V\n", io->cvIn0_volts);
-    // disp->printf("INPUT 1: %.2f V\n", io->cvIn1_volts);
-
-    // input -> output translation
-    int delta = (int)io->enc->getDirection() * ENCODER_DIRECTION;
-    // disp->printf("OUTPUT 0: %.3f V\n", outputVoltage);
-
-    // disp->printf("%.2f,%.2f,%.2f,%.2f,%.2f", voltages[])
-    drawGauge(127-9);
+    octave = floor(io->cvInVolts[1]);
+    if(octave > 0)
+    {
+        disp->setTextSize(2);
+        disp->setCursor(15, 62);
+        disp->printf("+%d", octave);
+        
+    }
 }
 
-void QuantizerUI::drawGauge(uint16_t x)
+
+
+void QuantizerUI::drawGauge(uint16_t x, float voltage, int arrowDirection)
 {
     auto io = IOManager::getInstance();
 
@@ -64,13 +92,11 @@ void QuantizerUI::drawGauge(uint16_t x)
 
     disp->drawRect(left, bottom - top, boxWidth, top, WHITE);
 
-    auto v = io->cvIn0_volts;
-    v -= floor(v); // keep only the decimal part
+    //auto v = io->cvInVolts[0];
+    int octave = floor(voltage);
+    voltage -= octave; // keep only the decimal part for display (the scale is on 1 octave only)
 
-    // drawArrowHorizontal(left - 6, bottom - v * voltFractionToScreenY);
-
-    // gauge level :
-    disp->fillRect(left + (boxWidth - gaugeWidth), bottom - v * voltFractionToScreenY, gaugeWidth, v * voltFractionToScreenY, WHITE);
+    
 
     for (int i = 0; i < this->currentScale().num_notes; i++)
     {
@@ -80,92 +106,25 @@ void QuantizerUI::drawGauge(uint16_t x)
     }
 
     // display the quantified value :
-    float q = rawVoltageToQuantizedVoltage(v);
+    float q = rawVoltageToQuantizedVoltage(voltage);
     int tickY = bottom - q * voltFractionToScreenY;
-    disp->fillTriangle(left - 4, tickY, left, tickY - 4, left, tickY + 4, WHITE);
-}
 
-void QuantizerUI::drawGraphicScaleVertical()
-{
-    auto io = IOManager::getInstance();
-
-    int left = 80;
-    int bottom = 63;
-    int width = 20;
-
-    const int voltFractionToScreenY = 1536 * 5 / 128; // == 60 :)
-
-    auto v = io->cvIn0_volts;
-    v -= floor(v); // keep only the decimal part
-
-    drawArrowHorizontal(left - 6, bottom - v * voltFractionToScreenY);
-    for (int i = 0; i < this->currentScale().num_notes; i++)
+    if(arrowDirection < 0)
     {
-        auto y = voltages[i] * voltFractionToScreenY;
-
-        disp->drawLine(left, bottom - y, left + width, bottom - y, WHITE);
+        //tick to the left
+        disp->fillTriangle(left - 4, tickY, left, tickY - 4, left, tickY + 4, WHITE);
+        // gauge level dock on the right (the raw input voltage)
+        disp->fillRect(left + (boxWidth - gaugeWidth), bottom - voltage * voltFractionToScreenY, gaugeWidth, voltage * voltFractionToScreenY, WHITE);
     }
-
-    // display the quantified value :
-    float q = rawVoltageToQuantizedVoltage(v);
-
-    drawArrowHorizontal(left + width + 2, bottom - q * voltFractionToScreenY);
-    // disp->drawLine(left + width + 2, bottom - q * voltFractionToScreenY, left + width + 5, bottom - q * voltFractionToScreenY, WHITE);
-}
-
-void QuantizerUI::drawGraphicScaleHorizontal()
-{
-    auto io = IOManager::getInstance();
-
-    int left = 0;
-    int top = 48;
-    // int bottom = 63;
-    int height = 8;
-
-    const int voltFractionToScreenY = 1536 * 10 / 128; // 10 pixels per semitone.
-
-    auto v = io->cvIn0_volts;
-
-    if (v > 0.6)
+    else
     {
-        Serial.println("HOP");
-        Serial.printf("%.3f volts");
-        Serial.println();
+        //tick to the right
+        disp->fillTriangle(left + boxWidth + 3, tickY, left + boxWidth -1, tickY - 4, left + boxWidth - 1, tickY + 4, WHITE);
+        // gauge level dock on the left (the raw input voltage)
+        disp->fillRect(left, bottom - voltage * voltFractionToScreenY, gaugeWidth, voltage * voltFractionToScreenY, WHITE);
     }
-
-    v -= floor(v); // keep only the decimal part
-
-    drawArrowVertical(v * voltFractionToScreenY, top - 8);
-    for (int i = 0; i < this->currentScale().num_notes; i++)
-    {
-        auto x = voltages[i] * voltFractionToScreenY;
-
-        disp->drawLine(x, top, x, top + height, WHITE);
-    }
-
-    // display the quantified value :
-    float q = rawVoltageToQuantizedVoltage(v);
-
-    drawArrowVertical(q * voltFractionToScreenY, top + height + 2);
-    // drawArrowVertical(left +width + 2, bottom - q * voltFractionToScreenY);
-    // disp->drawLine(left + width + 2, bottom - q * voltFractionToScreenY, left + width + 5, bottom - q * voltFractionToScreenY, WHITE);
 }
 
-void QuantizerUI::drawArrowVertical(uint16_t x, uint16_t y)
-{
-    uint16_t len = 5;
-    disp->drawLine(x, y, x, y + len, WHITE);
-    disp->drawLine(x - 3, y + len - 3, x, y + len, WHITE);
-    disp->drawLine(x + 3, y + len - 3, x, y + len, WHITE);
-}
-
-void QuantizerUI::drawArrowHorizontal(uint16_t x, uint16_t y)
-{
-    uint16_t len = 5;
-    disp->drawLine(x, y, x + len, y, WHITE);
-    disp->drawLine(x + len, y, x + len - 3, y - 3, WHITE);
-    disp->drawLine(x + len, y, x + len - 3, y + 3, WHITE);
-}
 
 float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 {
@@ -224,12 +183,12 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
     return 0;
 }
 
-void QuantizerUI::handleButtons()
+void QuantizerUI::handleIO()
 {
     auto io = IOManager::getInstance();
 
+    //The encoder changes the current scale index
     int delta = (int)io->enc->getDirection() * ENCODER_DIRECTION;
-
     this->_currentScaleIndex = constrain(_currentScaleIndex + delta, 0, braids::scaleCount - 1);
 
     if (delta != 0)
@@ -237,34 +196,15 @@ void QuantizerUI::handleButtons()
         initVoltages(braids::scales[_currentScaleIndex]);
     }
 
-    // float gateOut = io->gateIn0 ? 5 : 0;
-    // io->setCVOut(gateOut, 1, state);
-
-    /*
-        _currentOctave += delta;
-        if (_currentOctave < -5)
-            _currentOctave = -5;
-
-        if (_currentOctave > 5)
-            _currentOctave = 5;
-
-        io->setCVOut(_currentOctave, 0, state);
-
-        return;
-    */
     auto start = micros();
 
-    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvIn0_volts);
+    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[0]);
     io->setCVOut(outputVoltage, 0, state);
 
     auto end = micros();
 
     _lastConversionDuration_us = end - start;
 
-    // encoder change:common
-    // int delta = (int)io->enc->getDirection() * ENCODER_DIRECTION;
-    // if (io->enc->getRPM() > 300)
-    //    delta *= 50;
 }
 
 void QuantizerUI::onExit()
@@ -277,22 +217,12 @@ void QuantizerUI::onEnter()
 
     dumpCalibrations(state);
 }
-/*
-void QuantizerUI::initVoltages(int *scale, int scaleLength)
-{
-    braids::Scale s;
-    s = braids::scales[2];
 
-    for (int i = 0; i < scaleLength; i++)
-    {
-
-        // original method was: the intervals in a scale are expressed in cents, one cent being a semitone (i.e. 1/12 of volt)
-        float volts = scale[i] / 1200.0;
-        this->voltages[i] = volts;
-        Serial.printf("%.5f\n", this->voltages[i]);
-    }
-}
-*/
+/**
+ * @brief Takes a Scale struct, and initialize the voltages array. 1V == 1536 scale units (1 semitone == 128 units)
+ * 
+ * @param scale 
+ */
 void QuantizerUI::initVoltages(braids::Scale scale)
 {
     // In Braid's scale definition, 128 equals a half tone. Instead of 100 in the "cent" configuration.

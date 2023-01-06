@@ -82,20 +82,27 @@ void IOManager::updateInputs()
     // analog inputs:
 
     this->potValue = analogReadAverage(PIN_POT, ANALOG_READ_SAMPLE_COUNT);
-    this->cvIn0 = analogReadAverage(PIN_CV_IN_0, ANALOG_READ_SAMPLE_COUNT);
-    this->cvIn1 = analogReadAverage(PIN_CV_IN_1, ANALOG_READ_SAMPLE_COUNT);
+    this->cvIn[0] = analogReadAverage(PIN_CV_IN_0, ANALOG_READ_SAMPLE_COUNT);
+    this->cvIn[1] = analogReadAverage(PIN_CV_IN_1, ANALOG_READ_SAMPLE_COUNT);
     // convert the ADC values into volts, using the calibration data
-    this->cvIn0_volts = this->inputLinReg[0].a * (float)this->cvIn0 + this->inputLinReg[0].b;
-    this->cvIn1_volts = this->inputLinReg[1].a * (float)this->cvIn1 + this->inputLinReg[1].b;
 
+    #if USE_POT_AS_QUANTIZER_INPUT
+    cvInVolts[0] = (float)map(potValue, 0, 4095, 0, 5000) / 1000.0;
+    cvInVolts[1] = (float)map(potValue, 0, 4095, 0, 5000) / 1000.0;
+    //Serial.println(cvInVolts[0]);
+    //Serial.println(potValue);
+
+    #else
+    this->cvInVolts[0] = this->inputLinReg[0].a * (float)this->cvIn[0] + this->inputLinReg[0].b;
+    this->cvInVolts[1] = this->inputLinReg[1].a * (float)this->cvIn[1] + this->inputLinReg[1].b;
+    #endif
     // DEBUG ONLY !
-    //cvIn0_volts = (float)map(potValue, 0, 4095, 0, 5000) / 1000.0;
 
     // to display the CV input blank values:
-    if (this->cvIn0 > this->maxCvIn0)
-        this->maxCvIn0 = this->cvIn0;
-    if (this->cvIn1 > this->maxCvIn1)
-        this->maxCvIn1 = this->cvIn1;
+    if (this->cvIn[0] > this->maxCvIn0)
+        this->maxCvIn0 = this->cvIn[0];
+    if (this->cvIn[1] > this->maxCvIn1)
+        this->maxCvIn1 = this->cvIn[1];
 
     // gates in:
     // gateIn0 = digitalRead(PIN_GATE_IN_0);

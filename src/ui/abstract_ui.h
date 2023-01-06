@@ -20,7 +20,7 @@ public:
     const char *id;
 
     virtual void draw() {}
-    virtual void handleButtons() {}
+    virtual void handleIO() {}
 
     virtual void onEnter() {}
     virtual void onExit() {}

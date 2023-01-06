@@ -11,7 +11,7 @@ InputCalibrationUI::InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *s
     : AbstractUI(disp, state)
 {
     this->id = UI_INPUT_CALIBRATION;
-    tmrBlinkTopButton.setInterval(500000);
+    tmrBlinkButton.setInterval(500000);
 }
 
 void InputCalibrationUI::draw()
@@ -21,15 +21,15 @@ void InputCalibrationUI::draw()
     disp->setFont(&Org_01);
     disp->setCursor(0, 10);
 
-    //quick blink for the top button:
+    //quick blink for the bottom button:
     static bool ledState = 0;
-    if (tmrBlinkTopButton.isTimeReached())
+    if (tmrBlinkButton.isTimeReached())
     {
         ledState = !ledState;
-        io->setLedTop(ledState);
+        io->setLedBottom(ledState);
 
-        tmrBlinkTopButton.setInterval(ledState ? 10000 : 1000000);
-        tmrBlinkTopButton.reset();
+        tmrBlinkButton.setInterval(ledState ? 10000 : 1000000);
+        tmrBlinkButton.reset();
     }
 
     if (_currentInputBeingCalibrated < 0)
@@ -52,23 +52,23 @@ void InputCalibrationUI::draw()
     switch (input.id)
     {
     case 0:
-        _currentADCValue = io->cvIn0;
-        _currentVoltage = io->cvIn0_volts;
+        _currentADCValue = io->cvIn[0];
+        _currentVoltage = io->cvInVolts[0];
         break;
     case 1:
-        _currentADCValue = io->cvIn1;
-        _currentVoltage = io->cvIn1_volts;
+        _currentADCValue = io->cvIn[1];
+        _currentVoltage = io->cvInVolts[1];
         break;
     }
 
     disp->printf("\nADC VALUE: %d\nVOLTAGE: %.03f V", _currentADCValue, _currentVoltage);
 }
 
-void InputCalibrationUI::handleButtons()
+void InputCalibrationUI::handleIO()
 {
     auto io = IOManager::getInstance();
 
-    if (io->btnTop->pressed())
+    if (io->btnBottom->pressed())
     {
         // update the ADC value for the current input/voltage:
         tempCalibrations[_currentInputBeingCalibrated].digitalValue = _currentADCValue;
