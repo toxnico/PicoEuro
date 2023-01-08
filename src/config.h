@@ -1,14 +1,14 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define PEACOCK_VERSION "0.1.5"
+#define PEACOCK_VERSION "0.1.6"
 #define SPLASH_DURATION 2000
 
 //helpful to debug the calibration UIs, without writing to the flash memory for real
 #define DONT_REALLY_SAVE_CALIBRATIONS 0
 
 // For development purpose : replaces both CV inputs with the pot value, mapped between 0 and +5v
-#define USE_POT_AS_QUANTIZER_INPUT 1
+#define USE_POT_AS_QUANTIZER_INPUT 0
 
 // Enables the sample & hold feature in the quantizer:
 // a trigger must be sent to gate input 0 or 1 in order to update the CV output

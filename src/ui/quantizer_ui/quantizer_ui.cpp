@@ -76,14 +76,17 @@ void QuantizerUI::draw()
         
     }
 
+    disp->setTextSize(1);
     if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
     {
-        disp->setCursor(20,60);
-        disp->print("Sample and hold");
+        disp->setCursor(40,56);
+        disp->print("Sample");
+        disp->setCursor(40,63);
+        disp->print("and hold");
     }
     else
     {
-        disp->setCursor(20,60);
+        disp->setCursor(40,60);
         disp->print("Continuous");
     }
 }

@@ -26,6 +26,7 @@ private:
 public:
     //Properties:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
+    uint16_t triggerDelay = 0;
 
     //Methods:
     QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
