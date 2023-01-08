@@ -87,7 +87,6 @@
 #define UI_MAIN_MENU "MAIN_MENU"
 
 //This is the UI we want to load at startup:
-//#define UI_STARTUP UI_GENERAL_STATE
 #define UI_STARTUP UI_MAIN_MENU
 
 #endif // CONFIG_H

@@ -40,6 +40,11 @@ void MainMenuUI::handleEncoderClick()
             UIManager::getInstance()->activateById(UI_OUTPUT_CALIBRATION);
             return;
         }
+        if (menu->getSelectedChild() == menu->root->findByName(this->_general_state))
+        {
+            UIManager::getInstance()->activateById(UI_GENERAL_STATE);
+            return;
+        }
 
         menu->getSelectedChild()->isEditing = !menu->getSelectedChild()->isEditing;
     }
@@ -102,6 +107,9 @@ MenuDisplay *MainMenuUI::buildMenu()
     auto quantizer_opts = new MenuItem(_quantizer_opts);
     quantizer_opts->type = ValueType::None;
 
+    auto general_state = new MenuItem(_general_state);
+    general_state->type = ValueType::None;
+
     auto input_calibration = new MenuItem(_input_calibration);
     input_calibration->type = ValueType::None;
 
@@ -110,6 +118,7 @@ MenuDisplay *MainMenuUI::buildMenu()
 
     root->addChild(quantizer);
     root->addChild(quantizer_opts);
+    root->addChild(general_state);
     root->addChild(input_calibration);
     root->addChild(output_calibration);
 

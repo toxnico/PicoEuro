@@ -10,6 +10,7 @@ private:
     //menu names:
     const char* _quantizer = "QUANTIZER";
     const char* _quantizer_opts = "QUANTIZER OPTIONS";
+    const char* _general_state = "GENERAL STATE";
     const char* _input_calibration = "INPUT CALIBRATION";
     const char* _output_calibration = "OUTPUT CALIBRATION";
 

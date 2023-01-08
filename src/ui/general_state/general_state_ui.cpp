@@ -81,3 +81,7 @@ void GeneralStateUI::draw()
         io->setLedRight(false);
     }*/
 }
+
+void GeneralStateUI::handleIO(){
+    this->handleEncoderLongPressToGoBack();
+}

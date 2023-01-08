@@ -13,7 +13,7 @@ private:
 public:
     GeneralStateUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();    
-    
+    void handleIO();
     
 
     ////////////////////
