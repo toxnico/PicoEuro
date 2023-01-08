@@ -8,7 +8,9 @@
 #include "ui/general_state/general_state_ui.h"
 #include "ui/input_calibration/input_calibration_ui.h"
 #include "ui/output_calibration/output_calibration_ui.h"
-#include "ui/quantizer/quantizer_ui.h"
+#include "ui/quantizer_ui/quantizer_ui.h"
+#include "ui/quantizer_menu_ui/quantizer_menu_ui.h"
+#include "ui/main_menu_ui/main_menu_ui.h"
 #include "io/iomanager.h"
 #include "images/peacock_splash.h"
 #include "ui/uimanager.h"
@@ -22,6 +24,8 @@ GeneralStateUI *generalStateUI = NULL;
 InputCalibrationUI *inputCalibrationUI = NULL;
 OutputCalibrationUI *outputCalibrationUI = NULL;
 QuantizerUI *quantizerUI = NULL;
+QuantizerMenuUI *quantizerMenuUI = NULL;
+MainMenuUI *mainMenuUI = NULL;
 
 bool isInitialized = false;
 
@@ -111,13 +115,17 @@ void initUIs()
   inputCalibrationUI = new InputCalibrationUI(disp, state);
   outputCalibrationUI = new OutputCalibrationUI(disp, state);
   quantizerUI = new QuantizerUI(disp, state);
+  quantizerMenuUI = new QuantizerMenuUI(disp, state);
+  mainMenuUI = new MainMenuUI(disp, state);
 
   UIManager::getInstance()->uis[0] = generalStateUI;
   UIManager::getInstance()->uis[1] = inputCalibrationUI;
   UIManager::getInstance()->uis[2] = outputCalibrationUI;
   UIManager::getInstance()->uis[3] = quantizerUI;
+  UIManager::getInstance()->uis[4] = quantizerMenuUI;
+  UIManager::getInstance()->uis[5] = mainMenuUI;
 
-  UIManager::getInstance()->uiCount = 4;
+  UIManager::getInstance()->uiCount = 6;
 }
 
 /*
@@ -180,12 +188,12 @@ void loop()
 
   ui->currentUI()->handleIO();
 
-
+/*
   if (io->btnEnc->pressed())
   {
     ui->next();
   }
-
+*/
   
   //waiting for the correct front PCB :)
   //io->setGateOut0(true);

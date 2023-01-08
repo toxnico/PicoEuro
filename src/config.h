@@ -8,7 +8,7 @@
 #define DONT_REALLY_SAVE_CALIBRATIONS 0
 
 // For development purpose : replaces both CV inputs with the pot value, mapped between 0 and +5v
-#define USE_POT_AS_QUANTIZER_INPUT 0
+#define USE_POT_AS_QUANTIZER_INPUT 1
 
 // Enables the sample & hold feature in the quantizer:
 // a trigger must be sent to gate input 0 or 1 in order to update the CV output
@@ -56,8 +56,8 @@
 
 // to handle rotation speed of the encoder (in RPM)
 #define ENCODER_SPEED_THRESHOLD 300
-//#define CLICK_DELAY 300
-//#define LONG_PRESS_DELAY 2000
+
+#define LONG_PRESS_DELAY 1200
 
 // for input multisampling
 #define ANALOG_READ_SAMPLE_COUNT 21
@@ -83,10 +83,11 @@
 #define UI_INPUT_CALIBRATION "INPUT CALIBRATION"
 #define UI_OUTPUT_CALIBRATION "OUTPUT CALIBRATION"
 #define UI_QUANTIZER "QUANTIZER"
-
+#define UI_QUANTIZER_MENU "QUANTIZER_MENU"
+#define UI_MAIN_MENU "MAIN_MENU"
 
 //This is the UI we want to load at startup:
 //#define UI_STARTUP UI_GENERAL_STATE
-#define UI_STARTUP UI_QUANTIZER
+#define UI_STARTUP UI_MAIN_MENU
 
 #endif // CONFIG_H

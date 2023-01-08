@@ -11,6 +11,7 @@ typedef enum ValueType
 	Int,
 	Float,
 	Choice,
+	None
 } ValueType;
 
 class MenuItem

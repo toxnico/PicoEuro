@@ -16,12 +16,12 @@ public:
 	int8_t maxVisibleItems = 6;
 
 	
-    MenuItem* currentMenuItem = NULL;
+    MenuItem* root = NULL;
 
     MenuDisplay(Adafruit_GFX* disp);
 
-    void setMenuItem(MenuItem* item){
-        this->currentMenuItem = item;
+    void setRootItem(MenuItem* item){
+        this->root = item;
     }
     void draw();
 
@@ -32,12 +32,8 @@ public:
 
     MenuItem* getSelectedChild(){
 
-        //if(!this->currentMenuItem)
-        //    this->currentMenuItem = 
-
-
-        if(this->selectedIndex < this->currentMenuItem->childrenCount)
-            return this->currentMenuItem->children[this->selectedIndex];
+        if(this->selectedIndex < this->root->childrenCount)
+            return this->root->children[this->selectedIndex];
 
         return NULL;
     }

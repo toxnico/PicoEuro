@@ -8,36 +8,37 @@
 
 #include "note.h"
 
+typedef enum QuantificationMode_t
+{
+    Continuous = 0,
+    SampleAndHold = 1
+} QuantificationMode_t;
+
 class QuantizerUI : public AbstractUI
 {
 private:
-    // int scale[5] = {0,200,400,700,900};
-    // int scaleLength = 5;
     inline braids::Scale currentScale() { return braids::scales[_currentScaleIndex]; }
-    // float voltages[5];
+
     int _currentScaleIndex = 0;
-    // braids::Scale scale;
     float voltages[16];
-    float numVoltages = 0;
-
-    float _currentOctave = 0;
-
     uint64_t _lastConversionDuration_us = 0;
 
 public:
+    //Properties:
+    QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
+
+    //Methods:
     QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();
     void drawGauge(uint16_t x, float voltage, int arrowDirection);
     void handleIO();
-    void updateCVOut(uint8_t idx);
+    void quantizeChannelAndSendToCVOut(uint8_t channel);
     void onExit();
     void onEnter();
 
     float rawVoltageToQuantizedVoltage(float rawVoltage);
 
     // initialize the voltage values from the scale
-    // void initVoltages(int *scale, int scaleLength);
-
     void initVoltages(braids::Scale scale);
 };
 

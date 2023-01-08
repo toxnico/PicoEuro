@@ -60,6 +60,11 @@ void MenuItem::toString(char *buff)
     {
         sprintf(buff, "%s : %s", name, choices[getValueInt()]);
     }
+
+    if(type == ValueType::None)
+    {
+        strcpy(buff, name);
+    }
 }
 
 void MenuItem::increment()

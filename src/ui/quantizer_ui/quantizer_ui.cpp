@@ -61,9 +61,9 @@ void QuantizerUI::draw()
     if(octave > 0)
     {
         disp->setTextSize(2);
-        char buff[4];
-        sprintf(buff, "+%d", octave);
-        Graphics::printRightAligned(disp, buff, 24, 62);
+        disp->setCursor(16,62);
+        disp->printf("+%d", octave);
+        
         
     }
 
@@ -74,6 +74,17 @@ void QuantizerUI::draw()
         disp->setCursor(90, 62);
         disp->printf("+%d", octave);
         
+    }
+
+    if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
+    {
+        disp->setCursor(20,60);
+        disp->print("Sample and hold");
+    }
+    else
+    {
+        disp->setCursor(20,60);
+        disp->print("Continuous");
     }
 }
 
@@ -187,7 +198,10 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 
 void QuantizerUI::handleIO()
 {
+    handleEncoderLongPressToGoBack();
+    
     auto io = IOManager::getInstance();
+
 
     //The encoder changes the current scale index
     int delta = (int)io->enc->getDirection() * ENCODER_DIRECTION;
@@ -200,18 +214,23 @@ void QuantizerUI::handleIO()
 
     auto start = micros();
 
-    if(ENABLE_SAMPLE_AND_HOLD)
+    if(quantificationMode == QuantificationMode_t::SampleAndHold)
     {
+        //In sample and hold mode, we only update the DAC outputs 
+        //when the corresponding gate input rises
         if(io->gateIn0->rose())
-            updateCVOut(0);
+            quantizeChannelAndSendToCVOut(0);
         if(io->gateIn1->rose())
-            updateCVOut(1);
+            quantizeChannelAndSendToCVOut(1);
     }
-    else
+    if(quantificationMode == QuantificationMode_t::SampleAndHold)
     {
-        updateCVOut(0);
-        updateCVOut(1);
+        //In continuous mode, we constantly update the DAC outputs
+        quantizeChannelAndSendToCVOut(0);
+        quantizeChannelAndSendToCVOut(1);
     }
+
+
 
     //float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[0]);
     //io->setCVOut(outputVoltage, 0, state);
@@ -223,15 +242,15 @@ void QuantizerUI::handleIO()
 }
 
 /**
- * @brief Reads analog input at index idx, quantizes it and applies the quantized voltage to the output at index idx
+ * @brief Reads analog input at desired channel, quantizes it and applies the quantized voltage to the output at same channel
  * 
- * @param idx 
+ * @param channel 
  */
-void QuantizerUI::updateCVOut(uint8_t idx)
+void QuantizerUI::quantizeChannelAndSendToCVOut(uint8_t channel)
 {
     auto io = IOManager::getInstance();
-    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[idx]);
-    io->setCVOut(outputVoltage, idx, state);
+    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[channel]);
+    io->setCVOut(outputVoltage, channel, state);
 }
 
 void QuantizerUI::onExit()

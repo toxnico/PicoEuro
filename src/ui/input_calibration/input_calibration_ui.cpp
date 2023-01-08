@@ -66,6 +66,8 @@ void InputCalibrationUI::draw()
 
 void InputCalibrationUI::handleIO()
 {
+    handleEncoderLongPressToGoBack();
+    
     auto io = IOManager::getInstance();
 
     if (io->btnBottom->pressed())

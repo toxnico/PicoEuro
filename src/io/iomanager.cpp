@@ -145,22 +145,6 @@ void IOManager::setCVOut(float voltage, uint8_t channel, PeacockState_t *state)
     dac->analogWrite(dacValue, channel);
 }
 
-/*
-void IOManager::setCVOut(float voltage, uint8_t channel)
-{
-    float dacValue = outputLinReg[channel].a * voltage + outputLinReg[channel].b;
-    dac->analogWrite(dacValue, 0);
-}
-2048
-void IOManager::setCVOut0(float voltage)
-{
-    setCVOut(voltage, 0);
-}
-void IOManager::setCVOut1(float voltage)
-{
-    setCVOut(voltage, 1);
-}
-*/
 uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)
 {
     uint32_t sum = 0;

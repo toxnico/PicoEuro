@@ -50,6 +50,8 @@ void OutputCalibrationUI::draw()
 
 void OutputCalibrationUI::handleIO()
 {
+    handleEncoderLongPressToGoBack();
+    
     auto io = IOManager::getInstance();
 
     // encoder change:
