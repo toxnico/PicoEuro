@@ -143,6 +143,8 @@ void IOManager::setCVOut(float voltage, uint8_t channel, PeacockState_t *state)
     auto dacValue = getDACvalue(voltage, channel, state);
 
     dac->analogWrite(dacValue, channel);
+    this->currentOutputVoltages[channel] = voltage;
+    //Serial.println(this->currentOutputVoltages[channel]);
 }
 
 uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)

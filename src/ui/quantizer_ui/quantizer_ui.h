@@ -5,8 +5,8 @@
 #include <dmtimer.h>
 #include "o_c_scales.h"
 #include "o_c_scale_names.h"
-
-#include "note.h"
+#include "tools/delayed_executor.h"
+//#include "note.h"
 
 typedef enum QuantificationMode_t
 {
@@ -23,15 +23,20 @@ private:
     float voltages[16];
     uint64_t _lastConversionDuration_us = 0;
 
+    
+    DelayedExecutor delayedExecutors[ANALOG_OUTPUTS_COUNT];
+    //DelayedExecutor de;
+
 public:
     //Properties:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
-    uint16_t triggerDelay = 0;
+    uint32_t triggerDelay = 0;
 
     //Methods:
+    QuantizerUI() { }
     QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
     void draw();
-    void drawGauge(uint16_t x, float voltage, int arrowDirection);
+    void drawGauge(uint16_t x, float voltage, float quantifiedVoltage, int arrowDirection);
     void handleIO();
     void quantizeChannelAndSendToCVOut(uint8_t channel);
     void onExit();
@@ -42,5 +47,8 @@ public:
     // initialize the voltage values from the scale
     void initVoltages(braids::Scale scale);
 };
+
+//Default instance
+//extern QuantizerUI quantizerUI;
 
 #endif // QUANTIZERUI_H

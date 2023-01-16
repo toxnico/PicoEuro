@@ -4,6 +4,7 @@
 #include <Adafruit_SSD1306.h>
 #include "peacock/peacock_state.h"
 #include "io/iomanager.h"
+#include <EEPROM.h>
 // #include "ui/uimanager.h"
 
 class AbstractUI
@@ -11,7 +12,10 @@ class AbstractUI
 protected:
     Adafruit_SSD1306 *disp = NULL;
     PeacockState_t *state = NULL;
-
+    
+    //If this UI has a corresponding menu UI, this field
+    // allows direct access to it
+    AbstractUI *linkedMenuUI = NULL; 
 public:
     /**
      * @brief Basic constructor
@@ -19,11 +23,22 @@ public:
      * @param disp
      * @param state
      */
-    AbstractUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+    AbstractUI()
+    {
+    }
+
+    void init(Adafruit_SSD1306 *disp, PeacockState_t *state)
     {
         this->disp = disp;
         this->state = state;
+        
     }
+
+    /**
+     * @brief the address in the EEPROM to save the persistent parameters of the app.
+     * 
+     */
+    int saveAddress = -1;
 
     /**
      * @brief This is the UI identifier, an arbitrary string.
@@ -59,7 +74,14 @@ public:
      */
     virtual void onExit() {}
 
+    //
     void handleEncoderLongPressToGoBack();
+
+    //save the app state to the EEPROM
+    virtual void save() {}
+    virtual void load() {}
+
+    
 };
 
 #endif // ABSTRACT_UI_H

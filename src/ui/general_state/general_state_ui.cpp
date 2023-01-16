@@ -7,8 +7,8 @@
 #include <MCP_DAC.h>
 
 GeneralStateUI::GeneralStateUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
-    : AbstractUI(disp, state)
 {
+    this->init(disp, state);
     this->id = UI_GENERAL_STATE;
 }
 

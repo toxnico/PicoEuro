@@ -16,6 +16,7 @@ private:
     LinRegParams inputLinReg[ANALOG_INPUTS_COUNT];
     LinRegParams outputLinReg[ANALOG_OUTPUTS_COUNT];
     
+    float currentOutputVoltages[ANALOG_OUTPUTS_COUNT];
     
 
 public:
@@ -68,6 +69,10 @@ public:
     void initLinearRegressions(PeacockState_t *state);
     LinRegParams calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage);
 
+    float getCurrentOutputVoltage(uint8_t channel) 
+    {
+        return this->currentOutputVoltages[channel];
+    }
     
 };
 

@@ -2,8 +2,8 @@
 #include "ui/uimanager.h"
 
 MainMenuUI::MainMenuUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
-    : AbstractUI(disp, state)
 {
+    this->init(disp, state);
     this->id = UI_MAIN_MENU;
     this->menu = buildMenu();
 }
@@ -86,7 +86,7 @@ void MainMenuUI::handleIO()
 void MainMenuUI::onEnter()
 {
     // reset the menu position
-    this->menu->selectedIndex = 0;
+    //this->menu->selectedIndex = 0;
     for (uint8_t i = 0; i < menu->root->childrenCount; i++)
         menu->root->children[i]->isEditing = false;
 }

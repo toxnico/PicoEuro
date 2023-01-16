@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define PEACOCK_VERSION "0.1.6"
+#define PEACOCK_VERSION "0.1.7"
 #define SPLASH_DURATION 2000
 
 //helpful to debug the calibration UIs, without writing to the flash memory for real
@@ -12,7 +12,7 @@
 
 // Enables the sample & hold feature in the quantizer:
 // a trigger must be sent to gate input 0 or 1 in order to update the CV output
-#define ENABLE_SAMPLE_AND_HOLD 0
+#define ENABLE_SAMPLE_AND_HOLD 1
 
 // Depending on the encoder, it could be helpful to reverse this : 1 or -1
 #define ENCODER_DIRECTION -1
@@ -78,6 +78,7 @@
 #define OUTPUT_CALIBRATIONS_COUNT 11
 
 
+
 /* UI IDS */
 #define UI_GENERAL_STATE "GENERAL STATE"
 #define UI_INPUT_CALIBRATION "INPUT CALIBRATION"
@@ -87,6 +88,6 @@
 #define UI_MAIN_MENU "MAIN_MENU"
 
 //This is the UI we want to load at startup:
-#define UI_STARTUP UI_MAIN_MENU
+#define UI_STARTUP UI_QUANTIZER
 
 #endif // CONFIG_H

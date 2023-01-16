@@ -118,6 +118,33 @@ void initUIs()
   quantizerMenuUI = new QuantizerMenuUI(disp, state);
   mainMenuUI = new MainMenuUI(disp, state);
 
+  //
+  /* EEPROM ADRESS MAPPINGS */
+  int addr = 0;
+  inputCalibrationUI->saveAddress = addr;
+  
+  addr += sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT*ANALOG_INPUTS_COUNT;
+  outputCalibrationUI->saveAddress = addr;
+
+  addr += sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT*ANALOG_OUTPUTS_COUNT;
+  quantizerMenuUI->saveAddress = addr;
+  
+  #define ADDR_OUTPUT_CALIBRATIONS ();
+  #define ADDR_QUANTIZER_MENU (sizeof(Quantizer) * INPUT_CALIBRATIONS_COUNT*ANALOG_INPUTS_COUNT);
+
+
+  //
+
+
+  // while the settings are not persistent: //
+  quantizerUI->init(disp, state);
+  
+  
+  //quantizerUI->quantificationMode = ENABLE_SAMPLE_AND_HOLD ? QuantificationMode_t::SampleAndHold : QuantificationMode_t::Continuous;
+
+  //quantizerUI->triggerDelay = 500;
+  ////////////////////////////////////////////
+
   UIManager::getInstance()->uis[0] = generalStateUI;
   UIManager::getInstance()->uis[1] = inputCalibrationUI;
   UIManager::getInstance()->uis[2] = outputCalibrationUI;
@@ -126,6 +153,12 @@ void initUIs()
   UIManager::getInstance()->uis[5] = mainMenuUI;
 
   UIManager::getInstance()->uiCount = 6;
+
+  //load all the UI states from EEPROM:
+  for(uint8_t i = 0;i<UIManager::getInstance()->uiCount;i++)
+  {
+    UIManager::getInstance()->uis[i]->load();
+  }
 }
 
 /*
@@ -187,27 +220,14 @@ void loop()
   io->updateInputs();
 
   ui->currentUI()->handleIO();
-
-/*
-  if (io->btnEnc->pressed())
-  {
-    ui->next();
-  }
-*/
   
   //waiting for the correct front PCB :)
-  //io->setGateOut0(true);
-  //io->setGateOut1(true);
-  //io->setGateOut2(true);
-  //io->setGateOut3(true);
+  io->setGateOut0(true);
+  io->setGateOut1(true);
+  io->setGateOut2(true);
+  io->setGateOut3(true);
 
   // analog outputs test:
   int potValue = io->potValue;
 
-  // just in case
-  // int dacOut = constrain(potValue, 0, 4095);
-
-  //io->setCVOut(2.5, 0);
-  // io->dac->fastWriteA(dacOut);
-  // io->dac->fastWriteB(dacOut);
 }

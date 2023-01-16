@@ -9,8 +9,8 @@
 #include <EEPROM.h>
 
 OutputCalibrationUI::OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
-    : AbstractUI(disp, state)
 {
+    this->init(disp, state);
     this->id = UI_OUTPUT_CALIBRATION;
     tmrBlinkButton.setInterval(500000);
 }
