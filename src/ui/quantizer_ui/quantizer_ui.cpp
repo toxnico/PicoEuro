@@ -205,6 +205,17 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
     return 0;
 }
 
+void QuantizerUI::handleGate0IRQ(bool state)
+{
+    if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
+        this->quantizeChannelAndSendToCVOut(0);
+}
+void QuantizerUI::handleGate1IRQ(bool state)
+{
+    if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
+        this->quantizeChannelAndSendToCVOut(1);
+}
+
 void QuantizerUI::handleIO()
 {
     handleEncoderLongPressToGoBack();
@@ -221,7 +232,7 @@ void QuantizerUI::handleIO()
     }
 
     auto start = micros();
-
+/*
     // Let's read the input gates:
     if (quantificationMode == QuantificationMode_t::SampleAndHold)
     {
@@ -238,7 +249,7 @@ void QuantizerUI::handleIO()
             delayedExecutors[1].executeAfter(this->triggerDelay);
         }
     }
-    
+    */
     // In continuous mode, we constantly update the DAC outputs
     if (quantificationMode == QuantificationMode_t::Continuous)
     {

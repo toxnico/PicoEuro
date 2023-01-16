@@ -47,6 +47,11 @@ void QuantizerMenuUI::handleIO()
 
     if (menu->getSelectedChild()->isEditing)
     {
+        if(io->enc->getRPM() > 300)
+            menu->getSelectedChild()->incrementBy = 100;
+        else
+            menu->getSelectedChild()->incrementBy = 1;
+
         if (encDirection == 1)
             menu->getSelectedChild()->increment();
         if (encDirection == -1)
@@ -96,7 +101,7 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
     auto triggerDelay = new MenuItem(MENU_TRIGGER_DELAY);
     triggerDelay->type = ValueType::Int;
     triggerDelay->minimum = 0;
-    triggerDelay->maximum = 2000;
+    triggerDelay->maximum = 1000;
     triggerDelay->setValueInt(0);
     triggerDelay->changeCallback = [](MenuItem *sender)
     {
@@ -122,7 +127,7 @@ void QuantizerMenuUI::save()
         Serial.println("EEPROM write error");
 
     IOManager::getInstance()->setLedBottom(1);
-    delay(500);
+    delay(100);
     IOManager::getInstance()->setLedBottom(0);
 }
 

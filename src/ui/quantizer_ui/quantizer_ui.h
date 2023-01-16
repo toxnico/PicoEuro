@@ -42,6 +42,9 @@ public:
     void onExit();
     void onEnter();
 
+    void handleGate0IRQ(bool state);
+    void handleGate1IRQ(bool state);
+
     float rawVoltageToQuantizedVoltage(float rawVoltage);
 
     // initialize the voltage values from the scale

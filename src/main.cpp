@@ -161,16 +161,21 @@ void initUIs()
   }
 }
 
-/*
+
 void onGate0Change()
 {
-  bool status = gpio_get(PIN_GATE_IN_0);
-  //Serial.printf("Gate 0 %s\n", (status ? "HIGH" : "LOW"));
-  float voltage = status ? 5:0;
-  IOManager::getInstance()->setGateOut0(status);
-  //IOManager::getInstance()->setCVOut(voltage, 1, state);
+  bool state = gpio_get(PIN_GATE_IN_0);
+  quantizerUI->handleGate0IRQ(state);
+
 }
-*/
+
+void onGate1Change()
+{
+  bool state = gpio_get(PIN_GATE_IN_1);
+  quantizerUI->handleGate1IRQ(state);
+
+}
+
 void setup()
 {
 
@@ -207,7 +212,8 @@ void setup()
   UIManager::getInstance()->activateById(UI_STARTUP);
 
 
-  //attachInterrupt(PIN_GATE_IN_0, onGate0Change, PinStatus::CHANGE);
+  attachInterrupt(PIN_GATE_IN_0, onGate0Change, PinStatus::CHANGE);
+  attachInterrupt(PIN_GATE_IN_1, onGate1Change, PinStatus::CHANGE);
 
   isInitialized = true;
 }
