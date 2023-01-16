@@ -228,10 +228,12 @@ void loop()
   ui->currentUI()->handleIO();
   
   //waiting for the correct front PCB :)
-  io->setGateOut0(true);
-  io->setGateOut1(true);
-  io->setGateOut2(true);
-  io->setGateOut3(true);
+  //io->setGateOut0(true);
+  //io->setGateOut1(true);
+  //io->setGateOut2(true);
+  //io->setGateOut3(true);
+
+  
 
   // analog outputs test:
   int potValue = io->potValue;

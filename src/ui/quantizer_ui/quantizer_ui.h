@@ -23,9 +23,9 @@ private:
     float voltages[16];
     uint64_t _lastConversionDuration_us = 0;
 
+    //allows the output gates to get down after a certain time
+    DelayedExecutor delayedExecutors_lowerGates[ANALOG_OUTPUTS_COUNT];
     
-    DelayedExecutor delayedExecutors[ANALOG_OUTPUTS_COUNT];
-    //DelayedExecutor de;
 
 public:
     //Properties:

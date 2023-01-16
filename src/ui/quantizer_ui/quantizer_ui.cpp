@@ -207,13 +207,25 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 
 void QuantizerUI::handleGate0IRQ(bool state)
 {
+    auto io = IOManager::getInstance();
     if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
+    {
         this->quantizeChannelAndSendToCVOut(0);
+        io->setGateOut(0,1);
+        io->setLedLeft(1);
+        this->delayedExecutors_lowerGates[0].executeAfter(10000);
+    }
 }
 void QuantizerUI::handleGate1IRQ(bool state)
 {
+    auto io = IOManager::getInstance();
     if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
+    {
         this->quantizeChannelAndSendToCVOut(1);
+        io->setGateOut(1,1);
+        IOManager::getInstance()->setLedRight(1);
+        this->delayedExecutors_lowerGates[1].executeAfter(10000);
+    }
 }
 
 void QuantizerUI::handleIO()
@@ -232,24 +244,7 @@ void QuantizerUI::handleIO()
     }
 
     auto start = micros();
-/*
-    // Let's read the input gates:
-    if (quantificationMode == QuantificationMode_t::SampleAndHold)
-    {
-        // In sample and hold mode, we only update the DAC outputs
-        // when the corresponding gate input rises
-        if (io->gateIn0->rose())
-        {
-            //We schedule the CV output update in triggerDelay us (microseconds)
-            delayedExecutors[0].executeAfter(this->triggerDelay);
-            
-        }
-        if (io->gateIn1->rose())
-        {
-            delayedExecutors[1].executeAfter(this->triggerDelay);
-        }
-    }
-    */
+
     // In continuous mode, we constantly update the DAC outputs
     if (quantificationMode == QuantificationMode_t::Continuous)
     {
@@ -257,13 +252,20 @@ void QuantizerUI::handleIO()
         quantizeChannelAndSendToCVOut(1);
     }
 
-    //Check the delayedExecutors, to actually update the CV outputs
+    //Check the delayedExecutors, to switch the output gates back off
     for(uint8_t i = 0;i<ANALOG_OUTPUTS_COUNT;i++)
     {
-        delayedExecutors[i].update();
+        delayedExecutors_lowerGates[i].update();
 
-        if(delayedExecutors[i].isTimeElapsed())
-            quantizeChannelAndSendToCVOut(i);
+        if(delayedExecutors_lowerGates[i].isTimeElapsed())
+        {
+            io->setGateOut(i, 0);
+
+            if(i == 0)
+                IOManager::getInstance()->setLedLeft(0);
+            if(i == 1)
+                IOManager::getInstance()->setLedRight(0);
+        }
     }
   
     auto end = micros();
@@ -281,6 +283,7 @@ void QuantizerUI::quantizeChannelAndSendToCVOut(uint8_t channel)
     auto io = IOManager::getInstance();
     float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[channel]);
     io->setCVOut(outputVoltage, channel, state);
+
 }
 
 void QuantizerUI::onExit()

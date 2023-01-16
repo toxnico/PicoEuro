@@ -61,7 +61,6 @@ IOManager::IOManager()
     pinMode(PIN_GATE_OUT_1, OUTPUT);
     pinMode(PIN_GATE_OUT_2, OUTPUT);
     pinMode(PIN_GATE_OUT_3, OUTPUT);
-
 }
 
 /**
@@ -120,9 +119,31 @@ void IOManager::setLedBottom(bool state)
     digitalWrite(PIN_LED_BTN_BOTTOM, state);
 }
 
-// Gates are inverted electrially, so we need to invert the desired state !
+void IOManager::setGateOut(uint8_t channel, bool state)
+{
+    switch (channel)
+    {
+    case 0:
+        setGateOut0(state);
+        break;
+    case 1:
+        setGateOut1(state);
+        break;
+    case 2:
+        setGateOut2(state);
+        break;
+    case 3:
+        setGateOut3(state);
+        break;
+
+    default:
+        break;
+    }
+}
+
 void IOManager::setGateOut0(bool state)
 {
+    // Gates are inverted electrially, so we need to invert the desired state !
     digitalWrite(PIN_GATE_OUT_0, !state);
 }
 void IOManager::setGateOut1(bool state)
@@ -144,7 +165,7 @@ void IOManager::setCVOut(float voltage, uint8_t channel, PeacockState_t *state)
 
     dac->analogWrite(dacValue, channel);
     this->currentOutputVoltages[channel] = voltage;
-    //Serial.println(this->currentOutputVoltages[channel]);
+    // Serial.println(this->currentOutputVoltages[channel]);
 }
 
 uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)

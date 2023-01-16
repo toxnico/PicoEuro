@@ -57,6 +57,7 @@ public:
     void setLedTop(bool state);
     void setLedBottom(bool state);
 
+    void setGateOut(uint8_t channel, bool state);
     void setGateOut0(bool state);
     void setGateOut1(bool state);
     void setGateOut2(bool state);
