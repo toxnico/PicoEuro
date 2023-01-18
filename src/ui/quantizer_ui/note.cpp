@@ -1,6 +1,17 @@
 #include "note.h"
 
-char *Note::getNameFromNoteValue(float braidsNoteValue, int rootNoteIndex)
+const char *getNameFromNoteValue(float braidsNoteValue, int rootNoteIndex)
 {
-    return NULL;
+    //0 -> C, 128 -> C#, 256 -> D, etc...
+    float v = braidsNoteValue / 128.0;
+
+    int integerPart = round(v);
+
+    if(integerPart > 11)
+    {
+        return "N/A";
+    }
+
+    return note_names[integerPart];
+
 }

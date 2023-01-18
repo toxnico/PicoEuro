@@ -45,7 +45,9 @@ public:
     void handleGateIRQ(uint8_t channel, bool state);
     //void handleGate0IRQ(bool state);
     //void handleGate1IRQ(bool state);
-
+    const char* getNoteName(float voltage);
+    int indexOf(int num, int tolerance, int16_t *arr, int size);
+    int voltsToScaleUnits(float voltage);
     float rawVoltageToQuantizedVoltage(float rawVoltage);
 
     // initialize the voltage values from the scale

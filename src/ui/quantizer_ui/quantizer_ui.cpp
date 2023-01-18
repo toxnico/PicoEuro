@@ -6,6 +6,7 @@
 #include "graphics/graphics.h"
 #include "io/iomanager.h"
 #include "ui/uimanager.h"
+#include "note.h"
 
 QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
 {
@@ -13,6 +14,24 @@ QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
     this->id = UI_QUANTIZER;
     this->_currentScaleIndex = 11;
     this->linkedMenuUI = UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);
+}
+
+const char* QuantizerUI::getNoteName(float voltage)
+{
+    auto scaleValue = voltsToScaleUnits(voltage);
+    auto semitoneScale = braids::scales[1];
+    auto idx = indexOf(scaleValue, 0, semitoneScale.notes, semitoneScale.num_notes);
+    
+    if(idx > -1)
+    {
+        auto noteName = note_names[idx];
+        //auto noteNameFr = note_names_fr[idx];
+        return noteName;
+    }
+    else
+    {
+        return "";
+    }
 }
 
 void QuantizerUI::draw()
@@ -35,7 +54,7 @@ void QuantizerUI::draw()
     disp->setCursor((128 - w) / 2, 10);
     disp->print(scaleName);
 
-    uint16_t voltagesY = 30;
+    uint16_t voltagesY = 20;
     // channel 0:
     disp->setCursor(15, voltagesY);
     disp->printf("%.3f V", io()->cvInVolts[0]);
@@ -43,14 +62,22 @@ void QuantizerUI::draw()
     float q0 = io()->getCurrentOutputVoltage(0);
     disp->printf("%.3f V", q0);
 
+    //print the corresponding note name:
+    disp->setCursor(15,voltagesY +20);
+    disp->print(getNoteName(q0));
+    
+
     // channel 1:
     char buff[10];
-    // Graphics::printRightAligned(disp, )
     disp->setCursor(78, voltagesY);
     disp->printf("%.3f V", io()->cvInVolts[1]);
     disp->setCursor(78, voltagesY + 8);
     float q1 = io()->getCurrentOutputVoltage(1);
     disp->printf("%.3f V", q1);
+    
+    //print the corresponding note name:
+    disp->setCursor(78,voltagesY + 20);
+    disp->print(getNoteName(q1));
 
     // Gauges
     drawGauge(0, io()->cvInVolts[0], q0, 1);
@@ -91,9 +118,9 @@ void QuantizerUI::draw()
         disp->print("Continuous");
     }
 
-    //delay
-    //disp->setCursor(40, 49);
-    //disp->printf("Delay: %d us", this->triggerDelay);
+    // delay
+    // disp->setCursor(40, 49);
+    // disp->printf("Delay: %d us", this->triggerDelay);
 }
 
 void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, int arrowDirection)
@@ -118,7 +145,7 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
     }
 
     // display the quantified value :
-    //float q = rawVoltageToQuantizedVoltage(voltage);
+    // float q = rawVoltageToQuantizedVoltage(voltage);
     float q = quantifiedVoltage - octave;
     int tickY = bottom - q * voltFractionToScreenY;
 
@@ -139,6 +166,37 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
 }
 
 /**
+ * @brief Returns the index of num (more or less tolerance) 
+ *        in the array arr, of a given size.
+ * 
+ * @param num 
+ * @param tolerance 
+ * @param arr 
+ * @param size 
+ * @return int 
+ */
+int QuantizerUI::indexOf(int num, int tolerance, int16_t *arr, int size)
+{
+    for(int i=0;i<size;i++)
+    {
+        int delta = abs(arr[i] - num);
+
+        if(delta <= tolerance)
+            return i;
+
+    }
+    return -1;
+}
+
+int QuantizerUI::voltsToScaleUnits(float voltage)
+{
+    // remove the octave :
+    float fractionalPart = voltage - floor(voltage);
+
+    return (int)(fractionalPart * 1536.0);
+}
+
+/**
  * @brief Takes a voltage, and returns a quantified value according to the internal voltages[] array
  *
  * @param rawVoltage
@@ -146,8 +204,10 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
  */
 float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 {
+    braids::Scale scale = currentScale();
+
     // no scale :
-    if (this->currentScale().num_notes == 0)
+    if (scale.num_notes == 0)
     {
         return rawVoltage;
     }
@@ -155,8 +215,6 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
     float octave = floor(rawVoltage);
     float decimalPart = rawVoltage - octave;
     float outputVoltage = 0;
-
-    braids::Scale scale = currentScale();
 
     // let's browse our scale to find the upper and lower values for our raw voltage
 
@@ -203,20 +261,20 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
 
 void QuantizerUI::handleGateIRQ(uint8_t channel, bool state)
 {
-    if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
+    if (this->quantificationMode == QuantificationMode_t::SampleAndHold)
     {
-        if(state)
+        if (state)
         {
-            //rising edge
+            // rising edge
             this->quantizeChannelAndSendToCVOut(channel);
-            io()->setGateOut(channel,1);
+            io()->setGateOut(channel, 1);
             io()->setLedTop(channel, 1);
-            //this->delayedExecutors_lowerGates[0].executeAfter(10000);
+            // this->delayedExecutors_lowerGates[0].executeAfter(10000);
         }
         else
         {
-            //falling edge
-            io()->setGateOut(channel,0);
+            // falling edge
+            io()->setGateOut(channel, 0);
             io()->setLedTop(channel, 0);
         }
     }
@@ -225,8 +283,6 @@ void QuantizerUI::handleGateIRQ(uint8_t channel, bool state)
 void QuantizerUI::handleIO()
 {
     handleEncoderLongPressToGoBack();
-
-    
 
     // The encoder changes the current scale index
     int delta = (int)io()->enc->getDirection() * ENCODER_DIRECTION;
@@ -246,23 +302,23 @@ void QuantizerUI::handleIO()
         quantizeChannelAndSendToCVOut(1);
     }
 
-/*
-    //Check the delayedExecutors, to switch the output gates back off
-    for(uint8_t i = 0;i<ANALOG_OUTPUTS_COUNT;i++)
-    {
-        delayedExecutors_lowerGates[i].update();
-
-        if(delayedExecutors_lowerGates[i].isTimeElapsed())
+    /*
+        //Check the delayedExecutors, to switch the output gates back off
+        for(uint8_t i = 0;i<ANALOG_OUTPUTS_COUNT;i++)
         {
-            io()->setGateOut(i, 0);
-            IOManager::getInstance()->setLedTop(i, 0);
-            //if(i == 0)
-            //    IOManager::getInstance()->setLedLeft(0);
-            //if(i == 1)
-            //    IOManager::getInstance()->setLedRight(0);
+            delayedExecutors_lowerGates[i].update();
+
+            if(delayedExecutors_lowerGates[i].isTimeElapsed())
+            {
+                io()->setGateOut(i, 0);
+                IOManager::getInstance()->setLedTop(i, 0);
+                //if(i == 0)
+                //    IOManager::getInstance()->setLedLeft(0);
+                //if(i == 1)
+                //    IOManager::getInstance()->setLedRight(0);
+            }
         }
-    }
-  */
+      */
     auto end = micros();
 
     _lastConversionDuration_us = end - start;
@@ -277,7 +333,6 @@ void QuantizerUI::quantizeChannelAndSendToCVOut(uint8_t channel)
 {
     float outputVoltage = rawVoltageToQuantizedVoltage(io()->cvInVolts[channel]);
     io()->setCVOut(outputVoltage, channel, state);
-
 }
 
 void QuantizerUI::onExit()
@@ -311,5 +366,5 @@ void QuantizerUI::initVoltages(braids::Scale scale)
     Serial.println();
 }
 
-//Default instance
-//QuantizerUI quantizerUI;
+// Default instance
+// QuantizerUI quantizerUI;
