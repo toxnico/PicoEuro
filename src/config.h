@@ -7,12 +7,12 @@
 //helpful to debug the calibration UIs, without writing to the flash memory for real
 #define DONT_REALLY_SAVE_CALIBRATIONS 0
 
+//activate on the PCB version 1 to prevent shorting the transistor at gate outputs
+#define DEBUG_FIRST_PCB 0
+
 // For development purpose : replaces both CV inputs with the pot value, mapped between 0 and +5v
 #define USE_POT_AS_QUANTIZER_INPUT 0
 
-// Enables the sample & hold feature in the quantizer:
-// a trigger must be sent to gate input 0 or 1 in order to update the CV output
-#define ENABLE_SAMPLE_AND_HOLD 1
 
 // Depending on the encoder, it could be helpful to reverse this : 1 or -1
 #define ENCODER_DIRECTION -1
@@ -57,7 +57,7 @@
 // to handle rotation speed of the encoder (in RPM)
 #define ENCODER_SPEED_THRESHOLD 300
 
-#define LONG_PRESS_DELAY 1200
+#define LONG_PRESS_DELAY 1000
 
 // for input multisampling
 #define ANALOG_READ_SAMPLE_COUNT 21

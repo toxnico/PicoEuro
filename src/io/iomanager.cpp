@@ -102,6 +102,16 @@ void IOManager::updateInputs()
         this->maxCvIn1 = this->cvIn[1];
 }
 
+void IOManager::setLedTop(uint8_t channel, bool state)
+{
+    if(channel == 0)
+        setLedLeft(state);
+
+    if(channel == 1)
+        setLedRight(state);
+
+}
+
 void IOManager::setLedLeft(bool state)
 {
     digitalWrite(PIN_LED_LEFT, state);
@@ -110,11 +120,11 @@ void IOManager::setLedRight(bool state)
 {
     digitalWrite(PIN_LED_RIGHT, state);
 }
-void IOManager::setLedTop(bool state)
+void IOManager::setLedTopButton(bool state)
 {
     digitalWrite(PIN_LED_BTN_TOP, state);
 }
-void IOManager::setLedBottom(bool state)
+void IOManager::setLedBottomButton(bool state)
 {
     digitalWrite(PIN_LED_BTN_BOTTOM, state);
 }

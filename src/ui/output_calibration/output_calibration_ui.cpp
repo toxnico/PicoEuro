@@ -27,7 +27,7 @@ void OutputCalibrationUI::draw()
     if (tmrBlinkButton.isTimeReached())
     {
         ledState = !ledState;
-        io->setLedBottom(ledState);
+        io->setLedBottomButton(ledState);
 
         tmrBlinkButton.setInterval(ledState ? 10000 : 1000000);
         tmrBlinkButton.reset();

@@ -52,10 +52,11 @@ public:
 
     void updateInputs();
 
+    void setLedTop(uint8_t channel, bool state);
     void setLedLeft(bool state);
     void setLedRight(bool state);
-    void setLedTop(bool state);
-    void setLedBottom(bool state);
+    void setLedTopButton(bool state);
+    void setLedBottomButton(bool state);
 
     void setGateOut(uint8_t channel, bool state);
     void setGateOut0(bool state);

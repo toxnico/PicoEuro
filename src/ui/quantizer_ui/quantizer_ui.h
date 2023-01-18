@@ -24,13 +24,13 @@ private:
     uint64_t _lastConversionDuration_us = 0;
 
     //allows the output gates to get down after a certain time
-    DelayedExecutor delayedExecutors_lowerGates[ANALOG_OUTPUTS_COUNT];
+    //DelayedExecutor delayedExecutors_lowerGates[ANALOG_OUTPUTS_COUNT];
     
 
 public:
     //Properties:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
-    uint32_t triggerDelay = 0;
+    //uint32_t triggerDelay = 0;
 
     //Methods:
     QuantizerUI() { }
@@ -42,8 +42,9 @@ public:
     void onExit();
     void onEnter();
 
-    void handleGate0IRQ(bool state);
-    void handleGate1IRQ(bool state);
+    void handleGateIRQ(uint8_t channel, bool state);
+    //void handleGate0IRQ(bool state);
+    //void handleGate1IRQ(bool state);
 
     float rawVoltageToQuantizedVoltage(float rawVoltage);
 

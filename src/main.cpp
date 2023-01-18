@@ -122,28 +122,19 @@ void initUIs()
   /* EEPROM ADRESS MAPPINGS */
   int addr = 0;
   inputCalibrationUI->saveAddress = addr;
-  
-  addr += sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT*ANALOG_INPUTS_COUNT;
+
+  addr += sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT;
   outputCalibrationUI->saveAddress = addr;
 
-  addr += sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT*ANALOG_OUTPUTS_COUNT;
+  addr += sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT;
   quantizerMenuUI->saveAddress = addr;
-  
-  #define ADDR_OUTPUT_CALIBRATIONS ();
-  #define ADDR_QUANTIZER_MENU (sizeof(Quantizer) * INPUT_CALIBRATIONS_COUNT*ANALOG_INPUTS_COUNT);
+
+#define ADDR_OUTPUT_CALIBRATIONS ();
+#define ADDR_QUANTIZER_MENU (sizeof(Quantizer) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
 
 
-  //
+  //quantizerUI->init(disp, state);
 
-
-  // while the settings are not persistent: //
-  quantizerUI->init(disp, state);
-  
-  
-  //quantizerUI->quantificationMode = ENABLE_SAMPLE_AND_HOLD ? QuantificationMode_t::SampleAndHold : QuantificationMode_t::Continuous;
-
-  //quantizerUI->triggerDelay = 500;
-  ////////////////////////////////////////////
 
   UIManager::getInstance()->uis[0] = generalStateUI;
   UIManager::getInstance()->uis[1] = inputCalibrationUI;
@@ -154,26 +145,23 @@ void initUIs()
 
   UIManager::getInstance()->uiCount = 6;
 
-  //load all the UI states from EEPROM:
-  for(uint8_t i = 0;i<UIManager::getInstance()->uiCount;i++)
+  // load all the UI states from EEPROM:
+  for (uint8_t i = 0; i < UIManager::getInstance()->uiCount; i++)
   {
     UIManager::getInstance()->uis[i]->load();
   }
 }
 
-
 void onGate0Change()
 {
   bool state = gpio_get(PIN_GATE_IN_0);
-  quantizerUI->handleGate0IRQ(state);
-
+  quantizerUI->handleGateIRQ(0, state);
 }
 
 void onGate1Change()
 {
   bool state = gpio_get(PIN_GATE_IN_1);
-  quantizerUI->handleGate1IRQ(state);
-
+  quantizerUI->handleGateIRQ(1, state);
 }
 
 void setup()
@@ -184,7 +172,7 @@ void setup()
 
   // delay(2000);
   //  Init the pins for I2C
-  
+
   Wire.setSDA(PIN_I2C_SDA);
   Wire.setSCL(PIN_I2C_SCL);
 
@@ -211,7 +199,6 @@ void setup()
 
   UIManager::getInstance()->activateById(UI_STARTUP);
 
-
   attachInterrupt(PIN_GATE_IN_0, onGate0Change, PinStatus::CHANGE);
   attachInterrupt(PIN_GATE_IN_1, onGate1Change, PinStatus::CHANGE);
 
@@ -226,16 +213,15 @@ void loop()
   io->updateInputs();
 
   ui->currentUI()->handleIO();
-  
-  //waiting for the correct front PCB :)
-  //io->setGateOut0(true);
-  //io->setGateOut1(true);
-  //io->setGateOut2(true);
-  //io->setGateOut3(true);
 
-  
+// waiting for the correct front PCB :)
+#if DEBUG_FIRST_PCB
+  io->setGateOut0(true);
+  io->setGateOut1(true);
+  io->setGateOut2(true);
+  io->setGateOut3(true);
+#endif
 
   // analog outputs test:
   int potValue = io->potValue;
-
 }

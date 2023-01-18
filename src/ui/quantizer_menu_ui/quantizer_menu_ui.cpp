@@ -22,24 +22,23 @@ void QuantizerMenuUI::handleIO()
 {
     handleEncoderLongPressToGoBack();
 
-    auto io = IOManager::getInstance();
 
-    if(io->btnTop->pressed())
+    if(io()->btnTop->pressed())
     {
         this->load();
     }
 
     //testing: save the status into the EEPROM with a click of button 2
-    if(io->btnBottom->pressed())
+    if(io()->btnBottom->pressed())
     {
         Serial.println("Saving");
         Serial.println(this->saveAddress);
         this->save();
     }
 
-    int encDirection = (int)io->enc->getDirection() * ENCODER_DIRECTION;
+    int encDirection = (int)io()->enc->getDirection() * ENCODER_DIRECTION;
 
-    if (io->btnEnc->pressed())
+    if (io()->btnEnc->pressed())
     {
         menu->getSelectedChild()->isEditing = !menu->getSelectedChild()->isEditing;
         return;
@@ -47,7 +46,7 @@ void QuantizerMenuUI::handleIO()
 
     if (menu->getSelectedChild()->isEditing)
     {
-        if(io->enc->getRPM() > 300)
+        if(io()->enc->getRPM() > 300)
             menu->getSelectedChild()->incrementBy = 100;
         else
             menu->getSelectedChild()->incrementBy = 1;
@@ -98,19 +97,19 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
     };
 
     // Input trigger delay:
-    auto triggerDelay = new MenuItem(MENU_TRIGGER_DELAY);
-    triggerDelay->type = ValueType::Int;
-    triggerDelay->minimum = 0;
-    triggerDelay->maximum = 1000;
-    triggerDelay->setValueInt(0);
-    triggerDelay->changeCallback = [](MenuItem *sender)
-    {
-        auto quantizer_ui = (QuantizerUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER);
-        quantizer_ui->triggerDelay = (QuantificationMode_t)sender->getValueInt();
-    };
+    //auto triggerDelay = new MenuItem(MENU_TRIGGER_DELAY);
+    //triggerDelay->type = ValueType::Int;
+    //triggerDelay->minimum = 0;
+    //triggerDelay->maximum = 1000;
+    //triggerDelay->setValueInt(0);
+    //triggerDelay->changeCallback = [](MenuItem *sender)
+    //{
+    //    auto quantizer_ui = (QuantizerUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER);
+    //    quantizer_ui->triggerDelay = (QuantificationMode_t)sender->getValueInt();
+    //};
 
     root->addChild(quantizationMode);
-    root->addChild(triggerDelay);
+    //root->addChild(triggerDelay);
 
     m->setRootItem(root);
     m->selectedIndex = 0;
@@ -121,14 +120,14 @@ void QuantizerMenuUI::save()
 {
     QuantizerMenuUISave_t s;
     s.mode = menu->root->findByName(MENU_MODE)->getValueInt();
-    s.delay_us = menu->root->findByName(MENU_TRIGGER_DELAY)->getValueInt();
+    //s.delay_us = menu->root->findByName(MENU_TRIGGER_DELAY)->getValueInt();
     EEPROM.put<QuantizerMenuUISave_t>(this->saveAddress, s);
     if(!EEPROM.commit())
         Serial.println("EEPROM write error");
 
-    IOManager::getInstance()->setLedBottom(1);
+    io()->setLedBottomButton(1);
     delay(100);
-    IOManager::getInstance()->setLedBottom(0);
+    io()->setLedBottomButton(0);
 }
 
 void QuantizerMenuUI::load()
@@ -137,11 +136,11 @@ void QuantizerMenuUI::load()
     EEPROM.get<QuantizerMenuUISave_t>(this->saveAddress, s);
 
     menu->root->findByName(MENU_MODE)->setValueInt(s.mode);
-    menu->root->findByName(MENU_TRIGGER_DELAY)->setValueInt(s.delay_us);
+    //menu->root->findByName(MENU_TRIGGER_DELAY)->setValueInt(s.delay_us);
 
     //Apply these settings to the Quantizer itself
     auto quantizer = (QuantizerUI*)UIManager::getInstance()->getUIById(UI_QUANTIZER);
     quantizer->quantificationMode = (QuantificationMode_t)s.mode;
-    quantizer->triggerDelay = s.delay_us;
+    //quantizer->triggerDelay = s.delay_us;
     
 }

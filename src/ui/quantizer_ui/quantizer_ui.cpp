@@ -17,8 +17,6 @@ QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
 
 void QuantizerUI::draw()
 {
-    auto io = IOManager::getInstance();
-
     disp->setFont(&Org_01);
     disp->setTextSize(1);
     disp->setCursor(0, 10);
@@ -40,27 +38,27 @@ void QuantizerUI::draw()
     uint16_t voltagesY = 30;
     // channel 0:
     disp->setCursor(15, voltagesY);
-    disp->printf("%.3f V", io->cvInVolts[0]);
+    disp->printf("%.3f V", io()->cvInVolts[0]);
     disp->setCursor(15, voltagesY + 8);
-    float q0 = io->getCurrentOutputVoltage(0);
+    float q0 = io()->getCurrentOutputVoltage(0);
     disp->printf("%.3f V", q0);
 
     // channel 1:
     char buff[10];
     // Graphics::printRightAligned(disp, )
     disp->setCursor(78, voltagesY);
-    disp->printf("%.3f V", io->cvInVolts[1]);
+    disp->printf("%.3f V", io()->cvInVolts[1]);
     disp->setCursor(78, voltagesY + 8);
-    float q1 = io->getCurrentOutputVoltage(1);
+    float q1 = io()->getCurrentOutputVoltage(1);
     disp->printf("%.3f V", q1);
 
     // Gauges
-    drawGauge(0, io->cvInVolts[0], q0, 1);
+    drawGauge(0, io()->cvInVolts[0], q0, 1);
 
-    drawGauge(118, io->cvInVolts[1], q1, -1);
+    drawGauge(118, io()->cvInVolts[1], q1, -1);
 
     // draw the current octave (quantized) :
-    int octave = floor(io->cvInVolts[0]);
+    int octave = floor(io()->cvInVolts[0]);
     if (octave > 0)
     {
         disp->setTextSize(2);
@@ -68,7 +66,7 @@ void QuantizerUI::draw()
         disp->printf("+%d", octave);
     }
 
-    octave = floor(io->cvInVolts[1]);
+    octave = floor(io()->cvInVolts[1]);
     if (octave > 0)
     {
         char buff[10];
@@ -94,14 +92,12 @@ void QuantizerUI::draw()
     }
 
     //delay
-    disp->setCursor(40, 49);
-    disp->printf("Delay: %d us", this->triggerDelay);
+    //disp->setCursor(40, 49);
+    //disp->printf("Delay: %d us", this->triggerDelay);
 }
 
 void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, int arrowDirection)
 {
-    auto io = IOManager::getInstance();
-
     uint16_t left = x;
     uint16_t bottom = 63;
     uint16_t boxWidth = 9;
@@ -123,7 +119,7 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
 
     // display the quantified value :
     //float q = rawVoltageToQuantizedVoltage(voltage);
-    float q = quantifiedVoltage;
+    float q = quantifiedVoltage - octave;
     int tickY = bottom - q * voltFractionToScreenY;
 
     if (arrowDirection < 0)
@@ -205,26 +201,24 @@ float QuantizerUI::rawVoltageToQuantizedVoltage(float rawVoltage)
     return 0;
 }
 
-void QuantizerUI::handleGate0IRQ(bool state)
+void QuantizerUI::handleGateIRQ(uint8_t channel, bool state)
 {
-    auto io = IOManager::getInstance();
     if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
     {
-        this->quantizeChannelAndSendToCVOut(0);
-        io->setGateOut(0,1);
-        io->setLedLeft(1);
-        this->delayedExecutors_lowerGates[0].executeAfter(10000);
-    }
-}
-void QuantizerUI::handleGate1IRQ(bool state)
-{
-    auto io = IOManager::getInstance();
-    if(this->quantificationMode == QuantificationMode_t::SampleAndHold)
-    {
-        this->quantizeChannelAndSendToCVOut(1);
-        io->setGateOut(1,1);
-        IOManager::getInstance()->setLedRight(1);
-        this->delayedExecutors_lowerGates[1].executeAfter(10000);
+        if(state)
+        {
+            //rising edge
+            this->quantizeChannelAndSendToCVOut(channel);
+            io()->setGateOut(channel,1);
+            io()->setLedTop(channel, 1);
+            //this->delayedExecutors_lowerGates[0].executeAfter(10000);
+        }
+        else
+        {
+            //falling edge
+            io()->setGateOut(channel,0);
+            io()->setLedTop(channel, 0);
+        }
     }
 }
 
@@ -232,10 +226,10 @@ void QuantizerUI::handleIO()
 {
     handleEncoderLongPressToGoBack();
 
-    auto io = IOManager::getInstance();
+    
 
     // The encoder changes the current scale index
-    int delta = (int)io->enc->getDirection() * ENCODER_DIRECTION;
+    int delta = (int)io()->enc->getDirection() * ENCODER_DIRECTION;
     this->_currentScaleIndex = constrain(_currentScaleIndex + delta, 0, braids::scaleCount - 1);
 
     if (delta != 0)
@@ -252,6 +246,7 @@ void QuantizerUI::handleIO()
         quantizeChannelAndSendToCVOut(1);
     }
 
+/*
     //Check the delayedExecutors, to switch the output gates back off
     for(uint8_t i = 0;i<ANALOG_OUTPUTS_COUNT;i++)
     {
@@ -259,15 +254,15 @@ void QuantizerUI::handleIO()
 
         if(delayedExecutors_lowerGates[i].isTimeElapsed())
         {
-            io->setGateOut(i, 0);
-
-            if(i == 0)
-                IOManager::getInstance()->setLedLeft(0);
-            if(i == 1)
-                IOManager::getInstance()->setLedRight(0);
+            io()->setGateOut(i, 0);
+            IOManager::getInstance()->setLedTop(i, 0);
+            //if(i == 0)
+            //    IOManager::getInstance()->setLedLeft(0);
+            //if(i == 1)
+            //    IOManager::getInstance()->setLedRight(0);
         }
     }
-  
+  */
     auto end = micros();
 
     _lastConversionDuration_us = end - start;
@@ -280,9 +275,8 @@ void QuantizerUI::handleIO()
  */
 void QuantizerUI::quantizeChannelAndSendToCVOut(uint8_t channel)
 {
-    auto io = IOManager::getInstance();
-    float outputVoltage = rawVoltageToQuantizedVoltage(io->cvInVolts[channel]);
-    io->setCVOut(outputVoltage, channel, state);
+    float outputVoltage = rawVoltageToQuantizedVoltage(io()->cvInVolts[channel]);
+    io()->setCVOut(outputVoltage, channel, state);
 
 }
 

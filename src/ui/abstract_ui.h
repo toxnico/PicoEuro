@@ -5,17 +5,17 @@
 #include "peacock/peacock_state.h"
 #include "io/iomanager.h"
 #include <EEPROM.h>
-// #include "ui/uimanager.h"
 
 class AbstractUI
 {
 protected:
     Adafruit_SSD1306 *disp = NULL;
     PeacockState_t *state = NULL;
-    
-    //If this UI has a corresponding menu UI, this field
-    // allows direct access to it
-    AbstractUI *linkedMenuUI = NULL; 
+
+    // If this UI has a corresponding menu UI, this field
+    //  allows direct access to it
+    AbstractUI *linkedMenuUI = NULL;
+
 public:
     /**
      * @brief Basic constructor
@@ -31,12 +31,11 @@ public:
     {
         this->disp = disp;
         this->state = state;
-        
     }
 
     /**
      * @brief the address in the EEPROM to save the persistent parameters of the app.
-     * 
+     *
      */
     int saveAddress = -1;
 
@@ -77,11 +76,12 @@ public:
     //
     void handleEncoderLongPressToGoBack();
 
-    //save the app state to the EEPROM
+    // save the app state to the EEPROM
     virtual void save() {}
     virtual void load() {}
 
-    
+    // Helper method to quickly get the IOManager singleton
+    inline IOManager *io() { return IOManager::getInstance(); }
 };
 
 #endif // ABSTRACT_UI_H

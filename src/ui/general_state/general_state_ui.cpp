@@ -27,7 +27,7 @@ void GeneralStateUI::draw()
     disp->printf("CV IN: %.3f V/%.3f V\n", io->cvInVolts[0], io->cvInVolts[1]);
     //disp->printf("CV IN MAX : %d / %d\n", io->maxCvIn0, io->maxCvIn1);
 
-    disp->printf("GATES : %d/%d\n", io->gateIn0->read(), io->gateIn1->read());
+    disp->printf("GATES IN : %d/%d\n", io->gateIn0->read(), io->gateIn1->read());
 
     
     disp->printf("IN. CAL. VALID : %s\n", isSavedInputCalibrationValid() ? "YES" : "NO");
@@ -35,53 +35,35 @@ void GeneralStateUI::draw()
 
     if (io->btnTop->isPressed())
     {
-        io->setLedTop(true);
+        io->setLedTopButton(true);
         io->setLedLeft(true);
     }
     else
     {
-        io->setLedTop(false);
+        io->setLedTopButton(false);
         io->setLedLeft(false);
     }
 
     if (io->btnBottom->isPressed())
     {
-        io->setLedBottom(true);
+        io->setLedBottomButton(true);
         io->setLedRight(true);
     }
     else
     {
-        io->setLedBottom(false);
+        io->setLedBottomButton(false);
         io->setLedRight(false);
     }
 
-    //tests for the 4 gates :
-    io->setGateOut0(io->btnBottom->isPressed());
-    io->setGateOut1(io->btnBottom->isPressed());
-    io->setGateOut2(io->btnBottom->isPressed());
-    io->setGateOut3(io->btnBottom->isPressed());
 
-    //we enable the leds only if the encoder is pressed:
-    /*if (io->btnEnc->isPressed())
-    {
-        if (io->potValue > 2048)
-        {
-            io->setLedLeft(false);
-            io->setLedRight(true);
-        }
-        else
-        {
-            io->setLedLeft(true);
-            io->setLedRight(false);
-        }
-    }
-    else
-    {
-        io->setLedLeft(false);
-        io->setLedRight(false);
-    }*/
+    
 }
 
 void GeneralStateUI::handleIO(){
     this->handleEncoderLongPressToGoBack();
+    //tests for the 4 gates :
+    io()->setGateOut0(io()->btnBottom->isPressed());
+    io()->setGateOut1(io()->btnBottom->isPressed());
+    io()->setGateOut2(io()->btnBottom->isPressed());
+    io()->setGateOut3(io()->btnBottom->isPressed());
 }
