@@ -3,6 +3,10 @@
 #include <Arduino.h>
 #include "abstract_ui.h"
 
+/**
+ * @brief Singleton class for easy access to all the available UI instances, and activate them,
+ * 
+ */
 class UIManager
 {
 private:

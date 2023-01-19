@@ -6,6 +6,10 @@
 #include "peacock/peacock_state.h"
 #include "tools/linreg.h"
 
+/**
+ * @brief Class to interact with the IO hardware (buttons, gates, DAC, ADC, encoder, potentiometer)
+ * 
+ */
 class IOManager
 {
 private:

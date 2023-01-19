@@ -30,20 +30,33 @@
 #define BRAIDS_QUANTIZER_SCALES_H_
 
 #include <Arduino.h>
-// #include "braids_quantizer.h"
-// #include "OC_options.h"
 
+/**
+ * @brief Elements taken from the Braids code, by Mutable Instruments (MIT license)
+ * 
+ */
 namespace braids
 {
     const uint16_t scaleCount = 98;
 
+    /**
+     * @brief Definition of a scale, counting a maximum of 16 notes.
+     * 
+     */
     struct Scale
     {
+        // Number of units in one octave (or one volt if we're in 1v/oct)
         int16_t span;
+        //Number of notes in the scale
         size_t num_notes;
+        //Note list
         int16_t notes[16];
     };
 
+    /**
+     * @brief List of predefined scales, imported from Ornament & Crimes, hence from Braids.
+     * 
+     */
     const Scale scales[] = {
         // Off
         {0, 0, {}},

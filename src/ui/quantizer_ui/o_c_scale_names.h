@@ -6,6 +6,10 @@
 #ifndef OC_SCALE_NAMES_H
 #define OC_SCALE_NAMES_H
 
+/**
+ * @brief Short scale names
+ * 
+ */
 const char *const scale_names_short[] = {
 
     "OFF ",
@@ -115,6 +119,10 @@ const char *const scale_names_short[] = {
 
 };
 
+/**
+ * @brief Long scale names
+ * 
+ */
 const char *const scale_names[] = {
     "Off",
     "Semitone",

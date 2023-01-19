@@ -8,12 +8,20 @@
 #include "tools/delayed_executor.h"
 //#include "note.h"
 
+/**
+ * @brief Indicates when should a quantization happen : continuously, or when a gate is received.
+ * 
+ */
 typedef enum QuantificationMode_t
 {
     Continuous = 0,
     SampleAndHold = 1
 } QuantificationMode_t;
 
+/**
+ * @brief Class for the quantizer's main interface.
+ * 
+ */
 class QuantizerUI : public AbstractUI
 {
 private:
@@ -23,14 +31,9 @@ private:
     float voltages[16];
     uint64_t _lastConversionDuration_us = 0;
 
-    //allows the output gates to get down after a certain time
-    //DelayedExecutor delayedExecutors_lowerGates[ANALOG_OUTPUTS_COUNT];
-    
-
 public:
     //Properties:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
-    //uint32_t triggerDelay = 0;
 
     //Methods:
     QuantizerUI() { }
@@ -43,8 +46,7 @@ public:
     void onEnter();
 
     void handleGateIRQ(uint8_t channel, bool state);
-    //void handleGate0IRQ(bool state);
-    //void handleGate1IRQ(bool state);
+    
     const char* getNoteName(float voltage);
     int indexOf(int num, int tolerance, int16_t *arr, int size);
     int voltsToScaleUnits(float voltage);

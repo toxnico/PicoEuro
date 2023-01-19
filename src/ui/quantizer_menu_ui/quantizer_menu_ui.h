@@ -15,6 +15,10 @@ typedef struct QuantizerMenuUISave_t{
 } QuantizerMenuUISave_t;
 
 
+/**
+ * @brief UI for the quantizer options menu
+ * 
+ */
 class QuantizerMenuUI : public AbstractUI
 {
 private:

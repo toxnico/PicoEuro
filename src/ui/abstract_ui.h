@@ -6,10 +6,16 @@
 #include "io/iomanager.h"
 #include <EEPROM.h>
 
+/**
+ * @brief Base class for any UI class (aka screen, view or whatever.)
+ * 
+ */
 class AbstractUI
 {
 protected:
+    //the display interface
     Adafruit_SSD1306 *disp = NULL;
+    
     PeacockState_t *state = NULL;
 
     // If this UI has a corresponding menu UI, this field

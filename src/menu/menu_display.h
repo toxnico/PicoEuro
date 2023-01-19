@@ -6,6 +6,13 @@
 #include "ui/abstract_ui.h"
 //#include "Fonts/Org_01.h"
 
+/**
+ * @brief This class handles the drawing of a complete menu.
+ * the ```root``` property points to the main menu item.
+ * The title of the menu is the root's name.
+ * The items displayed are the root's children.
+ * 
+ */
 class MenuDisplay
 {
 private:

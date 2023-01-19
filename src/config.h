@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#define PEACOCK_VERSION "0.1.7"
+#define PEACOCK_VERSION "0.1.8"
 #define SPLASH_DURATION 2000
 
 //helpful to debug the calibration UIs, without writing to the flash memory for real
