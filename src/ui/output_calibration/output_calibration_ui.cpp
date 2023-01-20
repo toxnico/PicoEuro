@@ -8,9 +8,8 @@
 #include <MCP_DAC.h>
 #include <EEPROM.h>
 
-OutputCalibrationUI::OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+OutputCalibrationUI::OutputCalibrationUI()
 {
-    this->init(disp, state);
     this->id = UI_OUTPUT_CALIBRATION;
     tmrBlinkButton.setInterval(500000);
 }
@@ -83,9 +82,9 @@ void OutputCalibrationUI::handleIO()
 #else
 
             // we copy our temporary calibration data to the state's calibrations
-            memcpy(state->outputCalibrations, tempCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
+            memcpy(this->io()->calibrations->outputCalibrations, tempCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
 
-            bool saved = saveState(state);
+            bool saved = saveState(this->io()->calibrations);
             if (saved)
                 Serial.println("Saved state !");
             else
@@ -136,5 +135,5 @@ void OutputCalibrationUI::onExit()
 void OutputCalibrationUI::onEnter()
 {
     //dumpCalibrations(state);
-    memcpy(tempCalibrations, state->outputCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
+    memcpy(tempCalibrations, this->io()->calibrations->outputCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
 }

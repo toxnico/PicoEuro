@@ -7,9 +7,9 @@
 #include <MCP_DAC.h>
 #include <EEPROM.h>
 
-InputCalibrationUI::InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+InputCalibrationUI::InputCalibrationUI()
 {
-    this->init(disp, state);
+    
     this->id = UI_INPUT_CALIBRATION;
     tmrBlinkButton.setInterval(500000);
 }
@@ -87,10 +87,11 @@ void InputCalibrationUI::handleIO()
             return;
 #else            
 
+        
             //we copy our temporary calibration data to the state's calibrations
-            memcpy(state->inputCalibrations, tempCalibrations, sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
+            memcpy(this->io()->calibrations->inputCalibrations, tempCalibrations, sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
 
-            bool saved = saveState(state);
+            bool saved = saveState(this->io()->calibrations);
             if (saved)
                 Serial.println("Saved state !");
             else
@@ -124,5 +125,5 @@ void InputCalibrationUI::onExit()
 
 void InputCalibrationUI::onEnter()
 {
-    memcpy(tempCalibrations, state->inputCalibrations, sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
+    memcpy(tempCalibrations, this->io()->calibrations->inputCalibrations, sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
 }

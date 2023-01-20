@@ -5,6 +5,7 @@
 #include <MCP_DAC.h>
 #include "peacock/peacock_state.h"
 #include "tools/linreg.h"
+#include "peacock/peacock_state.h"
 
 /**
  * @brief Class to interact with the IO hardware (buttons, gates, DAC, ADC, encoder, potentiometer)
@@ -25,6 +26,8 @@ private:
 
 public:
     static IOManager *getInstance();
+
+    IOCalibrations_t *calibrations = NULL;
 
     Bounce2::Button *btnEnc = NULL;
     Bounce2::Button *btnTop = NULL;
@@ -47,9 +50,6 @@ public:
     uint16_t maxCvIn0 = 0;
     uint16_t maxCvIn1 = 0;
 
-    //uint8_t gateIn0 = 0;
-    //uint8_t gateIn1 = 0;
-
     // methods
 
     IOManager();
@@ -68,11 +68,11 @@ public:
     void setGateOut2(bool state);
     void setGateOut3(bool state);
 
-    void setCVOut(float voltage, uint8_t channel, PeacockState_t *state);
+    void setCVOut(float voltage, uint8_t channel);
 
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
     uint16_t analogReadMedian(uint8_t pin, uint8_t sampleCount);
-    void initLinearRegressions(PeacockState_t *state);
+    void initLinearRegressions(IOCalibrations_t *state);
     LinRegParams calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage);
 
     float getCurrentOutputVoltage(uint8_t channel) 

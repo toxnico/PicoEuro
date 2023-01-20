@@ -18,7 +18,7 @@ public:
 
     MenuDisplay* menu = NULL;
     
-    MainMenuUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
+    MainMenuUI();
     MenuDisplay* buildMenu();
     
     void handleEncoderRotation();

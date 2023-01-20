@@ -1,22 +1,22 @@
 #ifndef ABSTRACT_UI_H
 #define ABSTRACT_UI_H
 
-#include <Adafruit_SSD1306.h>
-#include "peacock/peacock_state.h"
 #include "io/iomanager.h"
+#include "peacock/peacock_state.h"
+#include <Adafruit_SSD1306.h>
 #include <EEPROM.h>
 
 /**
  * @brief Base class for any UI class (aka screen, view or whatever.)
- * 
+ *
  */
 class AbstractUI
 {
 protected:
-    //the display interface
+    // the display interface
     Adafruit_SSD1306 *disp = NULL;
-    
-    PeacockState_t *state = NULL;
+
+    //PeacockState_t *state = NULL;
 
     // If this UI has a corresponding menu UI, this field
     //  allows direct access to it
@@ -33,10 +33,10 @@ public:
     {
     }
 
-    void init(Adafruit_SSD1306 *disp, PeacockState_t *state)
+    void init(Adafruit_SSD1306 *disp)
     {
         this->disp = disp;
-        this->state = state;
+        //this->state = state;
     }
 
     /**
@@ -66,6 +66,8 @@ public:
      *
      */
     virtual void handleIO() {}
+
+    virtual void handleGateIRQ(uint8_t channel, bool state) {}
 
     /**
      * @brief Called when the UI is activated

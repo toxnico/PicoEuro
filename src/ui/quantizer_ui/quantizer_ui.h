@@ -36,8 +36,7 @@ public:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
 
     //Methods:
-    QuantizerUI() { }
-    QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
+    QuantizerUI();
     void draw();
     void drawGauge(uint16_t x, float voltage, float quantifiedVoltage, int arrowDirection);
     void handleIO();

@@ -8,9 +8,8 @@
 #include "ui/uimanager.h"
 #include "note.h"
 
-QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+QuantizerUI::QuantizerUI()
 {
-    this->init(disp, state);
     this->id = UI_QUANTIZER;
     this->_currentScaleIndex = 11;
     this->linkedMenuUI = UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);
@@ -265,9 +264,14 @@ void QuantizerUI::handleGateIRQ(uint8_t channel, bool state)
     {
         if (state)
         {
-            // rising edge
+            // rising edge.
+            //Sample & hold the channel
             this->quantizeChannelAndSendToCVOut(channel);
+
+            //set the output gate high
             io()->setGateOut(channel, 1);
+
+            //light up the LED
             io()->setLedTop(channel, 1);
             // this->delayedExecutors_lowerGates[0].executeAfter(10000);
         }
@@ -332,7 +336,7 @@ void QuantizerUI::handleIO()
 void QuantizerUI::quantizeChannelAndSendToCVOut(uint8_t channel)
 {
     float outputVoltage = rawVoltageToQuantizedVoltage(io()->cvInVolts[channel]);
-    io()->setCVOut(outputVoltage, channel, state);
+    io()->setCVOut(outputVoltage, channel);
 }
 
 void QuantizerUI::onExit()
@@ -343,7 +347,7 @@ void QuantizerUI::onEnter()
 {
     initVoltages(this->currentScale());
 
-    dumpCalibrations(state);
+    dumpCalibrations(this->io()->calibrations);
 }
 
 /**

@@ -25,7 +25,7 @@ void dumpCalibration(Calibration_t *cal)
     Serial.printf("CV%d | %.2f volts | %d \n", cal->id, cal->voltage, cal->digitalValue);
 }
 
-void dumpCalibrations(PeacockState_t *state)
+void dumpCalibrations(IOCalibrations_t *state)
 {
     Serial.println("INPUT CALIBRATIONS :");
     for (uint8_t i = 0; i < (INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT); i++)
@@ -48,23 +48,23 @@ void dumpCalibrations(PeacockState_t *state)
     }
 }
 
-bool saveState(PeacockState_t *state)
+bool saveState(IOCalibrations_t *state)
 {
-    PeacockState_t tmp;
-    memcpy(&tmp, state, sizeof(PeacockState_t));
-    EEPROM.put<PeacockState_t>(0, tmp);
+    IOCalibrations_t tmp;
+    memcpy(&tmp, state, sizeof(IOCalibrations_t));
+    EEPROM.put<IOCalibrations_t>(0, tmp);
     return EEPROM.commit();
 }
-void loadStateInto(PeacockState_t *state)
+void loadStateInto(IOCalibrations_t *state)
 {
     
-    PeacockState_t tmp;
-    tmp = EEPROM.get<PeacockState_t>(0, tmp);
+    IOCalibrations_t tmp;
+    tmp = EEPROM.get<IOCalibrations_t>(0, tmp);
 
     /*if(!isCalibrationValid(&tmp))
         return;*/
 
-    memcpy(state, &tmp, sizeof(PeacockState_t));
+    memcpy(state, &tmp, sizeof(IOCalibrations_t));
 
     if (!isSavedInputCalibrationValid())
     {
@@ -82,19 +82,19 @@ void loadStateInto(PeacockState_t *state)
 
 bool isSavedInputCalibrationValid()
 {
-    PeacockState_t tmp;
-    tmp = EEPROM.get<PeacockState_t>(0, tmp);
+    IOCalibrations_t tmp;
+    tmp = EEPROM.get<IOCalibrations_t>(0, tmp);
     return tmp.inputCalibrations[2].voltage == 1;
 }
 
 bool isSavedOutputCalibrationValid()
 {
-    PeacockState_t tmp;
-    tmp = EEPROM.get<PeacockState_t>(0, tmp);
+    IOCalibrations_t tmp;
+    tmp = EEPROM.get<IOCalibrations_t>(0, tmp);
     return tmp.outputCalibrations[2].voltage == -3;
 }
 
-int getDACvalue(float voltage, uint8_t channel, PeacockState_t *state)
+int getDACvalue(float voltage, uint8_t channel, IOCalibrations_t *state)
 {
     // retrieve the calibration elements for the desired channel:
     Calibration_t calibrationsForThisChannel[OUTPUT_CALIBRATIONS_COUNT];
@@ -134,7 +134,7 @@ int getDACvalue(float voltage, uint8_t channel, PeacockState_t *state)
     return -1;
 }
 
-void initDefaultInputCalibrations(PeacockState_t *state)
+void initDefaultInputCalibrations(IOCalibrations_t *state)
 {
     state->inputCalibrations[0].id = 0;
     state->inputCalibrations[0].digitalValue = 21;
@@ -184,7 +184,7 @@ void initDefaultInputCalibrations(PeacockState_t *state)
     state->inputCalibrations[11].digitalValue = 4011;
     state->inputCalibrations[11].voltage = 5;
 }
-void initDefaultOutputCalibrations(PeacockState_t *state)
+void initDefaultOutputCalibrations(IOCalibrations_t *state)
 {
     // CV0 | -5.00 volts | 55
     state->outputCalibrations[0].id = 0;

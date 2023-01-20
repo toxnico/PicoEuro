@@ -1,9 +1,8 @@
 #include "main_menu_ui.h"
 #include "ui/uimanager.h"
 
-MainMenuUI::MainMenuUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+MainMenuUI::MainMenuUI()
 {
-    this->init(disp, state);
     this->id = UI_MAIN_MENU;
     this->menu = buildMenu();
 }

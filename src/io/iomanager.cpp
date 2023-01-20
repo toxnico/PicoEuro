@@ -3,6 +3,7 @@
 #include <EEPROM.h>
 #include <math.h>
 
+
 IOManager *IOManager::_instance = NULL;
 
 /**
@@ -169,9 +170,9 @@ void IOManager::setGateOut3(bool state)
     digitalWrite(PIN_GATE_OUT_3, !state);
 }
 
-void IOManager::setCVOut(float voltage, uint8_t channel, PeacockState_t *state)
+void IOManager::setCVOut(float voltage, uint8_t channel)
 {
-    auto dacValue = getDACvalue(voltage, channel, state);
+    auto dacValue = getDACvalue(voltage, channel, calibrations);
 
     dac->analogWrite(dacValue, channel);
     this->currentOutputVoltages[channel] = voltage;
@@ -244,7 +245,7 @@ LinRegParams IOManager::calibrationValuesToLinRegParams(Calibration_t *cal, uint
     return computeLinReg(points, count);
 }
 
-void IOManager::initLinearRegressions(PeacockState_t *state)
+void IOManager::initLinearRegressions(IOCalibrations_t *state)
 {
     uint8_t count;
     // CV input 0

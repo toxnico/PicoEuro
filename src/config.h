@@ -90,4 +90,8 @@
 //This is the UI we want to load at startup:
 #define UI_STARTUP UI_QUANTIZER
 
+//VCO OPTIONS
+#define VCO_TIMER_PERIOD_US 10
+
+
 #endif // CONFIG_H
