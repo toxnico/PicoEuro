@@ -4,32 +4,34 @@
 #include <Adafruit_SSD1306.h>
 #include <Fonts/Org_01.h>
 #include "config.h"
-#include "peacock/peacock_state.h"
+#include "peacock/peacock_calibrations.h"
 #include "ui/general_state/general_state_ui.h"
 #include "ui/input_calibration/input_calibration_ui.h"
 #include "ui/output_calibration/output_calibration_ui.h"
 #include "ui/quantizer_ui/quantizer_ui.h"
 #include "ui/quantizer_menu_ui/quantizer_menu_ui.h"
 #include "ui/main_menu_ui/main_menu_ui.h"
+#include "ui/eeprom_ui/eeprom_ui.h"
 #include "io/iomanager.h"
 #include "images/peacock_splash.h"
 #include "ui/uimanager.h"
-
+#include "eeprom_mapping.h"
 #include <MCP_DAC.h>
 
 Adafruit_SSD1306 *disp = NULL;
 
-// AbstractUI *ui = NULL;
+
 GeneralStateUI *generalStateUI = NULL;
 InputCalibrationUI *inputCalibrationUI = NULL;
 OutputCalibrationUI *outputCalibrationUI = NULL;
 QuantizerUI *quantizerUI = NULL;
 QuantizerMenuUI *quantizerMenuUI = NULL;
 MainMenuUI *mainMenuUI = NULL;
+EepromUI *eepromUI = NULL;
 
 bool isInitialized = false;
 
-PeacockState_t *state = NULL;
+PeacockCalibrations_t *state = NULL;
 
 void setup1()
 {
@@ -57,7 +59,7 @@ void initState()
 {
 
   // init the module's state:
-  state = new PeacockState_t;
+  state = new PeacockCalibrations_t;
 
   // init the input calibration values
   uint8_t voltage = 0;
@@ -117,23 +119,11 @@ void initUIs()
   quantizerUI = new QuantizerUI(disp, state);
   quantizerMenuUI = new QuantizerMenuUI(disp, state);
   mainMenuUI = new MainMenuUI(disp, state);
+  eepromUI = new EepromUI(disp, state);
 
   //
   /* EEPROM ADRESS MAPPINGS */
-  int addr = 0;
-  inputCalibrationUI->saveAddress = addr;
-
-  addr += sizeof(Calibration_t) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT;
-  outputCalibrationUI->saveAddress = addr;
-
-  addr += sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT;
-  quantizerMenuUI->saveAddress = addr;
-
-#define ADDR_OUTPUT_CALIBRATIONS ();
-#define ADDR_QUANTIZER_MENU (sizeof(Quantizer) * INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT);
-
-
-  //quantizerUI->init(disp, state);
+  quantizerMenuUI->saveAddress = EEPROM_QUANTIZER_MENU_OFFSET;
 
 
   UIManager::getInstance()->uis[0] = generalStateUI;
@@ -142,32 +132,50 @@ void initUIs()
   UIManager::getInstance()->uis[3] = quantizerUI;
   UIManager::getInstance()->uis[4] = quantizerMenuUI;
   UIManager::getInstance()->uis[5] = mainMenuUI;
+  UIManager::getInstance()->uis[6] = eepromUI;
 
-  UIManager::getInstance()->uiCount = 6;
+  UIManager::getInstance()->uiCount = 7;
 
   // load all the UI states from EEPROM:
   for (uint8_t i = 0; i < UIManager::getInstance()->uiCount; i++)
   {
-    UIManager::getInstance()->uis[i]->load();
+    auto ui = UIManager::getInstance()->uis[i];
+    if(ui->saveAddress < 0)
+      continue;
+
+    ui->load();
   }
 }
 
+/**
+ * @brief Interrupt handler for gate input 0
+ * 
+ */
 void onGate0Change()
 {
   bool state = gpio_get(PIN_GATE_IN_0);
-  quantizerUI->handleGateIRQ(0, state);
+  //quantizerUI->handleGateIRQ(0, state);
+  UIManager::getInstance()->currentUI()->handleGateIRQ(0, state);
 }
 
+/**
+ * @brief Interrupt handler for gate input 1
+ * 
+ */
 void onGate1Change()
 {
   bool state = gpio_get(PIN_GATE_IN_1);
-  quantizerUI->handleGateIRQ(1, state);
+  //quantizerUI->handleGateIRQ(1, state);
+  UIManager::getInstance()->currentUI()->handleGateIRQ(1, state);
 }
 
+/**
+ * @brief General initialization
+ * 
+ */
 void setup()
 {
 
-  //  put your setup code here, to run once:
   Serial.begin(9600);
 
   // delay(2000);
@@ -193,7 +201,7 @@ void setup()
 
   IOManager::getInstance()->initLinearRegressions(state);
 
-  Serial.println(sizeof(PeacockState_t));
+  Serial.println(sizeof(PeacockCalibrations_t));
 
   initUIs();
 

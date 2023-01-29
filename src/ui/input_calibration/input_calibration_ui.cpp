@@ -7,7 +7,7 @@
 #include <MCP_DAC.h>
 #include <EEPROM.h>
 
-InputCalibrationUI::InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+InputCalibrationUI::InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
 {
     this->init(disp, state);
     this->id = UI_INPUT_CALIBRATION;

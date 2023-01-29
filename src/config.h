@@ -86,6 +86,7 @@
 #define UI_QUANTIZER "QUANTIZER"
 #define UI_QUANTIZER_MENU "QUANTIZER_MENU"
 #define UI_MAIN_MENU "MAIN_MENU"
+#define UI_EEPROM "EEPROM"
 
 //This is the UI we want to load at startup:
 #define UI_STARTUP UI_QUANTIZER

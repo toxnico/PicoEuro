@@ -3,7 +3,7 @@
 #include <Bounce2.h>
 #include <RotaryEncoder.h>
 #include <MCP_DAC.h>
-#include "peacock/peacock_state.h"
+#include "peacock/peacock_calibrations.h"
 #include "tools/linreg.h"
 
 /**
@@ -68,11 +68,11 @@ public:
     void setGateOut2(bool state);
     void setGateOut3(bool state);
 
-    void setCVOut(float voltage, uint8_t channel, PeacockState_t *state);
+    void setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *state);
 
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
     uint16_t analogReadMedian(uint8_t pin, uint8_t sampleCount);
-    void initLinearRegressions(PeacockState_t *state);
+    void initLinearRegressions(PeacockCalibrations_t *state);
     LinRegParams calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage);
 
     float getCurrentOutputVoltage(uint8_t channel) 

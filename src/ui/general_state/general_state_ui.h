@@ -3,7 +3,7 @@
 
 #include "../abstract_ui.h"
 #include "config.h"
-#include "peacock/peacock_state.h"
+#include "peacock/peacock_calibrations.h"
 #include <MCP_DAC.h>
 
 class GeneralStateUI : public AbstractUI
@@ -11,7 +11,7 @@ class GeneralStateUI : public AbstractUI
 private:
     
 public:
-    GeneralStateUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
+    GeneralStateUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
     void draw();    
     void handleIO();
     

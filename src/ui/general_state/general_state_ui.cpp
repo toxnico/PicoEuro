@@ -2,11 +2,11 @@
 #include <Fonts/Org_01.h>
 
 #include "graphics/graphics.h"
-#include "peacock/peacock_state.h"
+#include "peacock/peacock_calibrations.h"
 #include "io/iomanager.h"
 #include <MCP_DAC.h>
 
-GeneralStateUI::GeneralStateUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+GeneralStateUI::GeneralStateUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
 {
     this->init(disp, state);
     this->id = UI_GENERAL_STATE;

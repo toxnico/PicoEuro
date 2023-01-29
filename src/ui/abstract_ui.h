@@ -2,7 +2,7 @@
 #define ABSTRACT_UI_H
 
 #include <Adafruit_SSD1306.h>
-#include "peacock/peacock_state.h"
+#include "peacock/peacock_calibrations.h"
 #include "io/iomanager.h"
 #include <EEPROM.h>
 
@@ -16,7 +16,7 @@ protected:
     //the display interface
     Adafruit_SSD1306 *disp = NULL;
     
-    PeacockState_t *state = NULL;
+    PeacockCalibrations_t *state = NULL;
 
     // If this UI has a corresponding menu UI, this field
     //  allows direct access to it
@@ -33,7 +33,7 @@ public:
     {
     }
 
-    void init(Adafruit_SSD1306 *disp, PeacockState_t *state)
+    void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
     {
         this->disp = disp;
         this->state = state;
@@ -79,8 +79,19 @@ public:
      */
     virtual void onExit() {}
 
-    //
+    /**
+     * @brief If the user presses the encoder for one second or so, this is called.
+     * 
+     */
     void handleEncoderLongPressToGoBack();
+
+    /**
+     * @brief Handler for interrupt requests on gates.
+     * 
+     * @param channel 
+     * @param state 
+     */
+    virtual void handleGateIRQ(uint8_t channel, bool state) { }
 
     // save the app state to the EEPROM
     virtual void save() {}

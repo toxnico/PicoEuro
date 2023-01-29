@@ -3,7 +3,7 @@
 
 #include "../abstract_ui.h"
 #include "config.h"
-#include "peacock/peacock_state.h"
+#include "peacock/peacock_calibrations.h"
 #include <MCP_DAC.h>
 #include <dmtimer.h>
 
@@ -18,7 +18,7 @@ private:
     Calibration_t tempCalibrations[INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT];
     
 public:
-    InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
+    InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
     void draw();    
     
     void handleIO();

@@ -16,7 +16,7 @@ private:
     Calibration_t tempCalibrations[OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT];
 
 public:
-    OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
+    OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
     void draw();
 
     void handleIO();

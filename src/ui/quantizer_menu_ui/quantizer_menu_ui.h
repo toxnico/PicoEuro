@@ -30,7 +30,7 @@ private:
 public:
     MenuDisplay* menu = NULL;
     
-    QuantizerMenuUI(Adafruit_SSD1306 *disp, PeacockState_t *state);
+    QuantizerMenuUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
     MenuDisplay* buildMenu();
     
     

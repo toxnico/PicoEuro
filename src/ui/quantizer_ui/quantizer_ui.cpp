@@ -8,7 +8,7 @@
 #include "ui/uimanager.h"
 #include "note.h"
 
-QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockState_t *state)
+QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
 {
     this->init(disp, state);
     this->id = UI_QUANTIZER;
@@ -64,9 +64,9 @@ void QuantizerUI::draw()
 
     //print the corresponding note name:
     disp->setCursor(15,voltagesY +20);
+    disp->setTextSize(2);
     disp->print(getNoteName(q0));
-    
-
+    disp->setTextSize(1);
     // channel 1:
     char buff[10];
     disp->setCursor(78, voltagesY);
@@ -77,7 +77,9 @@ void QuantizerUI::draw()
     
     //print the corresponding note name:
     disp->setCursor(78,voltagesY + 20);
+    disp->setTextSize(2);
     disp->print(getNoteName(q1));
+    disp->setTextSize(1);
 
     // Gauges
     drawGauge(0, io()->cvInVolts[0], q0, 1);
