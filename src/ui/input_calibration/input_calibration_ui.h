@@ -30,4 +30,5 @@ public:
 
 };
 
+static InputCalibrationUI inputCalibrationUI;
 #endif // INPUT_CALIBRATION_H

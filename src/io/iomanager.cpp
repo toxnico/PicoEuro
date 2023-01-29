@@ -169,9 +169,9 @@ void IOManager::setGateOut3(bool state)
     digitalWrite(PIN_GATE_OUT_3, !state);
 }
 
-void IOManager::setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *state)
+void IOManager::setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *calibrations)
 {
-    auto dacValue = getDACvalue(voltage, channel, state);
+    auto dacValue = getDACvalue(voltage, channel, calibrations);
 
     dac->analogWrite(dacValue, channel);
     this->currentOutputVoltages[channel] = voltage;
@@ -244,27 +244,27 @@ LinRegParams IOManager::calibrationValuesToLinRegParams(Calibration_t *cal, uint
     return computeLinReg(points, count);
 }
 
-void IOManager::initLinearRegressions(PeacockCalibrations_t *state)
+void IOManager::initLinearRegressions(PeacockCalibrations_t *calibrations)
 {
     uint8_t count;
     // CV input 0
     Calibration_t calibrationsForCVin0[INPUT_CALIBRATIONS_COUNT];
-    count = getCalibrationsFor(0, state->inputCalibrations, INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT, calibrationsForCVin0, INPUT_CALIBRATIONS_COUNT);
+    count = getCalibrationsFor(0, calibrations->inputCalibrations, INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT, calibrationsForCVin0, INPUT_CALIBRATIONS_COUNT);
     inputLinReg[0] = calibrationValuesToLinRegParams(calibrationsForCVin0, count, true);
 
     // CV input 1
     Calibration_t calibrationsForCVin1[INPUT_CALIBRATIONS_COUNT];
-    count = getCalibrationsFor(1, state->inputCalibrations, INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT, calibrationsForCVin1, INPUT_CALIBRATIONS_COUNT);
+    count = getCalibrationsFor(1, calibrations->inputCalibrations, INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT, calibrationsForCVin1, INPUT_CALIBRATIONS_COUNT);
     inputLinReg[1] = calibrationValuesToLinRegParams(calibrationsForCVin1, count, true);
 
     // CV output 0
     Calibration_t calibrationsForCVout0[OUTPUT_CALIBRATIONS_COUNT];
-    count = getCalibrationsFor(0, state->outputCalibrations, OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT, calibrationsForCVout0, OUTPUT_CALIBRATIONS_COUNT);
+    count = getCalibrationsFor(0, calibrations->outputCalibrations, OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT, calibrationsForCVout0, OUTPUT_CALIBRATIONS_COUNT);
     outputLinReg[0] = calibrationValuesToLinRegParams(calibrationsForCVout0, count, false);
 
     // CV output 1
     Calibration_t calibrationsForCVout1[OUTPUT_CALIBRATIONS_COUNT];
-    count = getCalibrationsFor(1, state->outputCalibrations, OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT, calibrationsForCVout1, OUTPUT_CALIBRATIONS_COUNT);
+    count = getCalibrationsFor(1, calibrations->outputCalibrations, OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT, calibrationsForCVout1, OUTPUT_CALIBRATIONS_COUNT);
     outputLinReg[1] = calibrationValuesToLinRegParams(calibrationsForCVout1, count, false);
 
     Serial.printf("Input 0 : y = %f x + %f\n", inputLinReg[0].a, inputLinReg[0].b);

@@ -27,4 +27,5 @@ public:
     void onEnter();
 };
 
+static OutputCalibrationUI outputCalibrationUI;
 #endif // OUTPUTCALIBRATIONUI_H

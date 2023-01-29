@@ -68,11 +68,11 @@ public:
     void setGateOut2(bool state);
     void setGateOut3(bool state);
 
-    void setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *state);
+    void setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *calibrations);
 
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
     uint16_t analogReadMedian(uint8_t pin, uint8_t sampleCount);
-    void initLinearRegressions(PeacockCalibrations_t *state);
+    void initLinearRegressions(PeacockCalibrations_t *calibrations);
     LinRegParams calibrationValuesToLinRegParams(Calibration_t *cal, uint8_t count, bool digitalToVoltage);
 
     float getCurrentOutputVoltage(uint8_t channel) 

@@ -7,9 +7,9 @@ QuantizerMenuUI::QuantizerMenuUI()
     this->id = UI_QUANTIZER_MENU;
 }
 
-void QuantizerMenuUI::init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+void QuantizerMenuUI::init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *calibrations)
 {
-    AbstractUI::init(disp, state);
+    AbstractUI::init(disp, calibrations);
     this->menu = buildMenu();
 }
 
@@ -146,3 +146,4 @@ void QuantizerMenuUI::load()
     //quantizer->triggerDelay = s.delay_us;
     
 }
+

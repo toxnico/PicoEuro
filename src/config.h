@@ -65,6 +65,8 @@
 //we may want to increase this if there are more than 32 different user interfaces !
 #define MAX_UI_COUNT 32
 
+#define MAX_ARPEGGIATOR_STEPS 32
+
 /* CALIBRATION STUFF */
 
 //number of analog inputs

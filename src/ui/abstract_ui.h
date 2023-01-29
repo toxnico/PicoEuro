@@ -16,7 +16,7 @@ protected:
     //the display interface
     Adafruit_SSD1306 *disp = NULL;
     
-    PeacockCalibrations_t *state = NULL;
+    PeacockCalibrations_t *calibrations = NULL;
 
     // If this UI has a corresponding menu UI, this field
     //  allows direct access to it
@@ -33,10 +33,10 @@ public:
     {
     }
 
-    virtual void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+    virtual void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *calibrations)
     {
         this->disp = disp;
-        this->state = state;
+        this->calibrations = calibrations;
     }
 
     /**

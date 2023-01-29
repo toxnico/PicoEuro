@@ -27,4 +27,5 @@ public:
     */
 };
 
+static GeneralStateUI generalStateUI;
 #endif // GENERAL_STATE_UI_H

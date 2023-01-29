@@ -56,6 +56,6 @@ public:
 };
 
 //Default instance
-//extern QuantizerUI quantizerUI;
+static QuantizerUI quantizerUI;
 
 #endif // QUANTIZERUI_H

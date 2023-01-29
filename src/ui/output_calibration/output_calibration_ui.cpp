@@ -83,9 +83,9 @@ void OutputCalibrationUI::handleIO()
 #else
 
             // we copy our temporary calibration data to the state's calibrations
-            memcpy(state->outputCalibrations, tempCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
+            memcpy(calibrations->outputCalibrations, tempCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
 
-            bool saved = saveState(state);
+            bool saved = saveCalibrations(calibrations);
             if (saved)
                 Serial.println("Saved state !");
             else
@@ -136,5 +136,5 @@ void OutputCalibrationUI::onExit()
 void OutputCalibrationUI::onEnter()
 {
     //dumpCalibrations(state);
-    memcpy(tempCalibrations, state->outputCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
+    memcpy(tempCalibrations, calibrations->outputCalibrations, sizeof(Calibration_t) * OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT);
 }

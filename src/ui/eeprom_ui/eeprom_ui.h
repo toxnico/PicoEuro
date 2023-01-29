@@ -15,4 +15,5 @@ public:
 
 };
 
+static EepromUI eepromUI;
 #endif //EEPROM_UI_H

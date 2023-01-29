@@ -21,19 +21,9 @@
 
 Adafruit_SSD1306 *disp = NULL;
 
-
-GeneralStateUI *generalStateUI = NULL;
-InputCalibrationUI *inputCalibrationUI = NULL;
-OutputCalibrationUI *outputCalibrationUI = NULL;
-QuantizerUI *quantizerUI = NULL;
-QuantizerMenuUI *quantizerMenuUI = NULL;
-MainMenuUI *mainMenuUI = NULL;
-EepromUI *eepromUI = NULL;
-ArpeggiatorUI *arpeggiatorUI = NULL;
-
 bool isInitialized = false;
 
-PeacockCalibrations_t *state = NULL;
+PeacockCalibrations_t *calibrations = NULL;
 
 void setup1()
 {
@@ -61,7 +51,7 @@ void initState()
 {
 
   // init the module's state:
-  state = new PeacockCalibrations_t;
+  calibrations = new PeacockCalibrations_t;
 
   // init the input calibration values
   uint8_t voltage = 0;
@@ -70,9 +60,9 @@ void initState()
   {
     for (uint8_t cv = 0; cv < ANALOG_INPUTS_COUNT; cv++)
     {
-      state->inputCalibrations[i + cv].id = cv;
-      state->inputCalibrations[i + cv].voltage = voltage;
-      state->inputCalibrations[i + cv].digitalValue = 600 * voltage;
+      calibrations->inputCalibrations[i + cv].id = cv;
+      calibrations->inputCalibrations[i + cv].voltage = voltage;
+      calibrations->inputCalibrations[i + cv].digitalValue = 600 * voltage;
     }
 
     voltage++;
@@ -86,9 +76,9 @@ void initState()
 
     for (uint8_t v = 0; v < OUTPUT_CALIBRATIONS_COUNT; v++)
     {
-      state->outputCalibrations[idx].id = cv;
-      state->outputCalibrations[idx].voltage = v - 5;
-      state->outputCalibrations[idx].digitalValue = 100 * v;
+      calibrations->outputCalibrations[idx].id = cv;
+      calibrations->outputCalibrations[idx].voltage = v - 5;
+      calibrations->outputCalibrations[idx].digitalValue = 100 * v;
       idx++;
     }
   }
@@ -115,29 +105,30 @@ void splash()
  */
 void initUIs()
 {
+  /*
   generalStateUI = new GeneralStateUI();
   inputCalibrationUI = new InputCalibrationUI();
-  outputCalibrationUI = new OutputCalibrationUI();
+  //outputCalibrationUI = new OutputCalibrationUI();
   quantizerUI = new QuantizerUI();
-  quantizerMenuUI = new QuantizerMenuUI();
+  //quantizerMenuUI = new QuantizerMenuUI();
   mainMenuUI = new MainMenuUI();
   //mainMenuUI->init(disp, state);
   eepromUI = new EepromUI();
   arpeggiatorUI = new ArpeggiatorUI();
-
+*/
   //
   /* EEPROM ADRESS MAPPINGS */
-  quantizerMenuUI->saveAddress = EEPROM_QUANTIZER_MENU_OFFSET;
+  quantizerMenuUI.saveAddress = EEPROM_QUANTIZER_MENU_OFFSET;
 
 
-  UIManager::getInstance()->uis[0] = generalStateUI;
-  UIManager::getInstance()->uis[1] = inputCalibrationUI;
-  UIManager::getInstance()->uis[2] = outputCalibrationUI;
-  UIManager::getInstance()->uis[3] = quantizerUI;
-  UIManager::getInstance()->uis[4] = quantizerMenuUI;
-  UIManager::getInstance()->uis[5] = mainMenuUI;
-  UIManager::getInstance()->uis[6] = eepromUI;
-  UIManager::getInstance()->uis[7] = arpeggiatorUI;
+  UIManager::getInstance()->uis[0] = &generalStateUI;
+  UIManager::getInstance()->uis[1] = &inputCalibrationUI;
+  UIManager::getInstance()->uis[2] = &outputCalibrationUI;
+  UIManager::getInstance()->uis[3] = &quantizerUI;
+  UIManager::getInstance()->uis[4] = &quantizerMenuUI;
+  UIManager::getInstance()->uis[5] = &mainMenuUI;
+  UIManager::getInstance()->uis[6] = &eepromUI;
+  UIManager::getInstance()->uis[7] = &arpeggiatorUI;
 
   UIManager::getInstance()->uiCount = 8;
 
@@ -145,7 +136,7 @@ void initUIs()
   for (uint8_t i = 0; i < UIManager::getInstance()->uiCount; i++)
   {
     auto ui = UIManager::getInstance()->uis[i];
-    ui->init(disp, state);
+    ui->init(disp, calibrations);
     if(ui->saveAddress < 0)
       continue;
 
@@ -203,9 +194,9 @@ void setup()
   initState();
 
   // load state from EEPROM
-  loadStateInto(state);
+  loadCalibrationsInto(calibrations);
 
-  IOManager::getInstance()->initLinearRegressions(state);
+  IOManager::getInstance()->initLinearRegressions(calibrations);
 
   Serial.println(sizeof(PeacockCalibrations_t));
 

@@ -8,7 +8,7 @@
 #include "ui/uimanager.h"
 #include "note.h"
 
-QuantizerUI::QuantizerUI(/*Adafruit_SSD1306 *disp, PeacockCalibrations_t *state*/)
+QuantizerUI::QuantizerUI()
 {
     //this->init(disp, state);
     this->id = UI_QUANTIZER;
@@ -334,7 +334,7 @@ void QuantizerUI::handleIO()
 void QuantizerUI::quantizeChannelAndSendToCVOut(uint8_t channel)
 {
     float outputVoltage = rawVoltageToQuantizedVoltage(io()->cvInVolts[channel]);
-    io()->setCVOut(outputVoltage, channel, state);
+    io()->setCVOut(outputVoltage, channel, calibrations);
 }
 
 void QuantizerUI::onExit()
@@ -345,7 +345,7 @@ void QuantizerUI::onEnter()
 {
     initVoltages(this->currentScale());
 
-    dumpCalibrations(state);
+    dumpCalibrations(calibrations);
 }
 
 /**

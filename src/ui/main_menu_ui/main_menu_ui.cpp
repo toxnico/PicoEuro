@@ -8,9 +8,9 @@ MainMenuUI::MainMenuUI()
     //this->menu = buildMenu();
 }
 
-void MainMenuUI::init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+void MainMenuUI::init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *calibrations)
 {
-    AbstractUI::init(disp, state);
+    AbstractUI::init(disp, calibrations);
     this->menu = buildMenu();
 }
 
@@ -50,6 +50,12 @@ void MainMenuUI::handleEncoderClick()
         if (menu->getSelectedChild() == menu->root->findByName(this->_general_state))
         {
             UIManager::getInstance()->activateById(UI_GENERAL_STATE);
+            return;
+        }
+
+        if (menu->getSelectedChild() == menu->root->findByName(this->_arpeggiator))
+        {
+            UIManager::getInstance()->activateById(UI_ARPEGGIATOR);
             return;
         }
 
@@ -114,6 +120,9 @@ MenuDisplay *MainMenuUI::buildMenu()
     auto quantizer_opts = new MenuItem(_quantizer_opts);
     quantizer_opts->type = ValueType::None;
 
+    auto arpeggiator = new MenuItem(_arpeggiator);
+    arpeggiator->type = ValueType::None;
+
     auto general_state = new MenuItem(_general_state);
     general_state->type = ValueType::None;
 
@@ -125,6 +134,7 @@ MenuDisplay *MainMenuUI::buildMenu()
 
     root->addChild(quantizer);
     root->addChild(quantizer_opts);
+    root->addChild(arpeggiator);
     root->addChild(general_state);
     root->addChild(input_calibration);
     root->addChild(output_calibration);

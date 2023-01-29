@@ -32,16 +32,16 @@ typedef struct PeacockCalibrations_t
 uint8_t getCalibrationsFor(uint8_t id, Calibration_t *allCalibrations, uint8_t allCount, Calibration_t *filteredOutput, uint8_t maxFilteredOutputCount);
 
 void dumpCalibration(Calibration_t *cal);
-void dumpCalibrations(PeacockCalibrations_t *state);
+void dumpCalibrations(PeacockCalibrations_t *calibrations);
 
-bool saveState(PeacockCalibrations_t *state);
-void loadStateInto(PeacockCalibrations_t *state);
+bool saveCalibrations(PeacockCalibrations_t *calibrations);
+void loadCalibrationsInto(PeacockCalibrations_t *calibrations);
 bool isSavedInputCalibrationValid();
 bool isSavedOutputCalibrationValid();
 
-void initDefaultInputCalibrations(PeacockCalibrations_t *state);
-void initDefaultOutputCalibrations(PeacockCalibrations_t *state);
+void initDefaultInputCalibrations(PeacockCalibrations_t *calibrations);
+void initDefaultOutputCalibrations(PeacockCalibrations_t *calibrations);
 
-int getDACvalue(float voltage, uint8_t channel, PeacockCalibrations_t *state);
+int getDACvalue(float voltage, uint8_t channel, PeacockCalibrations_t *calibrations);
 
 #endif // PEACOCK_STATE_H

@@ -13,6 +13,7 @@ private:
     const char* _general_state = "GENERAL STATE";
     const char* _input_calibration = "INPUT CALIBRATION";
     const char* _output_calibration = "OUTPUT CALIBRATION";
+    const char* _arpeggiator = "ARPEGGIATOR";
 
 public:
 
@@ -24,7 +25,7 @@ public:
     void handleEncoderRotation();
     void handleEncoderClick();
     
-    void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
+    void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *calibrations);
 
     void draw();
     void handleIO();
@@ -34,4 +35,5 @@ public:
     
 };
 
+static MainMenuUI mainMenuUI;
 #endif // MAIN_MENU_UI_H
