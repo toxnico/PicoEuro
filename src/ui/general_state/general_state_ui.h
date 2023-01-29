@@ -11,7 +11,7 @@ class GeneralStateUI : public AbstractUI
 private:
     
 public:
-    GeneralStateUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
+    GeneralStateUI();
     void draw();    
     void handleIO();
     

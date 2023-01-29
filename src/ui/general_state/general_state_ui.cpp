@@ -6,9 +6,9 @@
 #include "io/iomanager.h"
 #include <MCP_DAC.h>
 
-GeneralStateUI::GeneralStateUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+GeneralStateUI::GeneralStateUI()
 {
-    this->init(disp, state);
+    //this->init(disp, state);
     this->id = UI_GENERAL_STATE;
 }
 

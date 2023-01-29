@@ -1,9 +1,9 @@
 #include "eeprom_ui.h"
 #include "ui/uimanager.h"
 
-EepromUI::EepromUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+EepromUI::EepromUI()
 {
-    this->init(disp, state);
+    //this->init(disp, state);
     this->id = UI_EEPROM;
 }
 

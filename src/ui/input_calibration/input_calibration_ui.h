@@ -18,7 +18,7 @@ private:
     Calibration_t tempCalibrations[INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT];
     
 public:
-    InputCalibrationUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
+    InputCalibrationUI();
     void draw();    
     
     void handleIO();

@@ -8,9 +8,9 @@
 #include "ui/uimanager.h"
 #include "note.h"
 
-QuantizerUI::QuantizerUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+QuantizerUI::QuantizerUI(/*Adafruit_SSD1306 *disp, PeacockCalibrations_t *state*/)
 {
-    this->init(disp, state);
+    //this->init(disp, state);
     this->id = UI_QUANTIZER;
     this->_currentScaleIndex = 11;
     this->linkedMenuUI = UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);

@@ -12,6 +12,7 @@
 #include "ui/quantizer_menu_ui/quantizer_menu_ui.h"
 #include "ui/main_menu_ui/main_menu_ui.h"
 #include "ui/eeprom_ui/eeprom_ui.h"
+#include "ui/arpeggiator_ui/arpeggiator_ui.h"
 #include "io/iomanager.h"
 #include "images/peacock_splash.h"
 #include "ui/uimanager.h"
@@ -28,6 +29,7 @@ QuantizerUI *quantizerUI = NULL;
 QuantizerMenuUI *quantizerMenuUI = NULL;
 MainMenuUI *mainMenuUI = NULL;
 EepromUI *eepromUI = NULL;
+ArpeggiatorUI *arpeggiatorUI = NULL;
 
 bool isInitialized = false;
 
@@ -113,13 +115,15 @@ void splash()
  */
 void initUIs()
 {
-  generalStateUI = new GeneralStateUI(disp, state);
-  inputCalibrationUI = new InputCalibrationUI(disp, state);
-  outputCalibrationUI = new OutputCalibrationUI(disp, state);
-  quantizerUI = new QuantizerUI(disp, state);
-  quantizerMenuUI = new QuantizerMenuUI(disp, state);
-  mainMenuUI = new MainMenuUI(disp, state);
-  eepromUI = new EepromUI(disp, state);
+  generalStateUI = new GeneralStateUI();
+  inputCalibrationUI = new InputCalibrationUI();
+  outputCalibrationUI = new OutputCalibrationUI();
+  quantizerUI = new QuantizerUI();
+  quantizerMenuUI = new QuantizerMenuUI();
+  mainMenuUI = new MainMenuUI();
+  //mainMenuUI->init(disp, state);
+  eepromUI = new EepromUI();
+  arpeggiatorUI = new ArpeggiatorUI();
 
   //
   /* EEPROM ADRESS MAPPINGS */
@@ -133,13 +137,15 @@ void initUIs()
   UIManager::getInstance()->uis[4] = quantizerMenuUI;
   UIManager::getInstance()->uis[5] = mainMenuUI;
   UIManager::getInstance()->uis[6] = eepromUI;
+  UIManager::getInstance()->uis[7] = arpeggiatorUI;
 
-  UIManager::getInstance()->uiCount = 7;
+  UIManager::getInstance()->uiCount = 8;
 
   // load all the UI states from EEPROM:
   for (uint8_t i = 0; i < UIManager::getInstance()->uiCount; i++)
   {
     auto ui = UIManager::getInstance()->uis[i];
+    ui->init(disp, state);
     if(ui->saveAddress < 0)
       continue;
 

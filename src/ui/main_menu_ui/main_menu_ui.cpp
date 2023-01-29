@@ -1,15 +1,22 @@
 #include "main_menu_ui.h"
 #include "ui/uimanager.h"
 
-MainMenuUI::MainMenuUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+MainMenuUI::MainMenuUI()
 {
-    this->init(disp, state);
+    //this->init(disp, state);
     this->id = UI_MAIN_MENU;
+    //this->menu = buildMenu();
+}
+
+void MainMenuUI::init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+{
+    AbstractUI::init(disp, state);
     this->menu = buildMenu();
 }
 
 void MainMenuUI::draw()
 {
+    //Serial.println("Menu draw");
     disp->setTextSize(1);
     disp->drawLine(0, 0, 127, 63, WHITE);
     this->menu->draw();

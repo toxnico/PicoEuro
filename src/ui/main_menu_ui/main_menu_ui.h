@@ -18,12 +18,14 @@ public:
 
     MenuDisplay* menu = NULL;
     
-    MainMenuUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
+    MainMenuUI();
     MenuDisplay* buildMenu();
     
     void handleEncoderRotation();
     void handleEncoderClick();
     
+    void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
+
     void draw();
     void handleIO();
     void onEnter();

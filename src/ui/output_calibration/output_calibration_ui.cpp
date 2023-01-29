@@ -8,9 +8,9 @@
 #include <MCP_DAC.h>
 #include <EEPROM.h>
 
-OutputCalibrationUI::OutputCalibrationUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+OutputCalibrationUI::OutputCalibrationUI()
 {
-    this->init(disp, state);
+    //this->init(disp, state);
     this->id = UI_OUTPUT_CALIBRATION;
     tmrBlinkButton.setInterval(500000);
 }

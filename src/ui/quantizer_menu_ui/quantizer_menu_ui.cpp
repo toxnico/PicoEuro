@@ -2,13 +2,15 @@
 #include "ui/quantizer_ui/quantizer_ui.h"
 #include "ui/uimanager.h"
 
-QuantizerMenuUI::QuantizerMenuUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+QuantizerMenuUI::QuantizerMenuUI()
 {
-    this->init(disp, state);
     this->id = UI_QUANTIZER_MENU;
+}
+
+void QuantizerMenuUI::init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+{
+    AbstractUI::init(disp, state);
     this->menu = buildMenu();
-    //this->quantizer = UIManager::getInstance()->getUIById(UI_QUANTIZER);
-    //this->menu->root->findByName(MENU_MODE)->setValueInt(0);
 }
 
 void QuantizerMenuUI::draw()

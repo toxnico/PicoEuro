@@ -33,7 +33,7 @@ public:
     {
     }
 
-    void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
+    virtual void init(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state)
     {
         this->disp = disp;
         this->state = state;

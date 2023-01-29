@@ -8,7 +8,7 @@ class EepromUI : public AbstractUI
 private:
     //
 public:
-    EepromUI(Adafruit_SSD1306 *disp, PeacockCalibrations_t *state);
+    EepromUI();
 
     void draw();
     void handleIO();
