@@ -8,20 +8,22 @@
 
 
 /**
- * @brief Class for the quantizer's main interface.
+ * @brief Class for the Arpeggiator's main interface.
  * 
  */
 class ArpeggiatorUI : public AbstractUI
 {
 private:
-    DMTimer _tmrNoteDuration;
+    //DMTimer _tmrNoteDuration;
     bool _isPlaying = false;
+    DelayedExecutor delayedExecGate;
 
 public:
     //Properties:
     int numSteps = 8;
     float arpVoltages[MAX_ARPEGGIATOR_STEPS];
     int arpDurations[MAX_ARPEGGIATOR_STEPS];
+    uint8_t outputGateIndex = 0;
 
     int currentPosition = 0;
 
@@ -39,6 +41,7 @@ public:
     
     void playNote(uint8_t channel, float voltage, int duration_us);
     void runSequence();
+    void playAndNext();
 };
 
 static ArpeggiatorUI arpeggiatorUI;

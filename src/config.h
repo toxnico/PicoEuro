@@ -11,7 +11,7 @@
 #define DEBUG_FIRST_PCB 0
 
 // For development purpose : replaces both CV inputs with the pot value, mapped between 0 and +5v
-#define USE_POT_AS_QUANTIZER_INPUT 0
+#define USE_POT_AS_QUANTIZER_INPUT 1
 
 
 // Depending on the encoder, it could be helpful to reverse this : 1 or -1
@@ -92,6 +92,6 @@
 #define UI_ARPEGGIATOR "ARPEGGIATOR"
 
 //This is the UI we want to load at startup:
-#define UI_STARTUP UI_QUANTIZER
+#define UI_STARTUP UI_ARPEGGIATOR
 
 #endif // CONFIG_H

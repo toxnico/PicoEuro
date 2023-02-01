@@ -59,7 +59,10 @@ public:
         return false;
     }
     
-    // void update();
+    inline void cancel()
+    {
+        this->_isExecutionPending = false;
+    }
 };
 
 #endif // DELAYED_EXECUTOR_H
