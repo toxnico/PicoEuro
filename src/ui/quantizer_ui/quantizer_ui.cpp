@@ -13,6 +13,7 @@ QuantizerUI::QuantizerUI()
     //this->init(disp, state);
     this->id = UI_QUANTIZER;
     this->_currentScaleIndex = 11;
+    
     this->linkedMenuUI = UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);
 }
 
@@ -369,4 +370,4 @@ void QuantizerUI::initVoltages(braids::Scale scale)
 }
 
 // Default instance
-// QuantizerUI quantizerUI;
+//QuantizerUI quantizerUI;

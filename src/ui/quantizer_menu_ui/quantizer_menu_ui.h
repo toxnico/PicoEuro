@@ -25,7 +25,6 @@ private:
     const char* MENU_MODE = "MODE";
     //const char* MENU_TRIGGER_DELAY = "TRIG. DELAY US";
 
-    //QuantizerUI *quantizer = NULL;
 
 public:
     MenuDisplay* menu = NULL;

@@ -25,13 +25,13 @@ typedef enum QuantificationMode_t
 class QuantizerUI : public AbstractUI
 {
 private:
-    inline braids::Scale currentScale() { return braids::scales[_currentScaleIndex]; }
 
     int _currentScaleIndex = 0;
     float voltages[16];
     uint64_t _lastConversionDuration_us = 0;
 
 public:
+    inline braids::Scale currentScale() { return braids::scales[_currentScaleIndex]; }
     //Properties:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
 

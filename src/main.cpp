@@ -141,6 +141,7 @@ void initUIs()
       continue;
 
     ui->load();
+    ui->onEnter();
   }
 }
 

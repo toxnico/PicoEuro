@@ -27,6 +27,17 @@ public:
     }
 
     /**
+     * @brief indicates if the execution has been done.
+     * 
+     * @return true 
+     * @return false 
+     */
+    inline bool isWaitingForExecution()
+    {
+        return _isExecutionPending;
+    }
+
+    /**
      * @brief Check the time, and raise the flag to execute the stuff.
      * 
      */

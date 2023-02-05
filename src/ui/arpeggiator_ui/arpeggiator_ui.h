@@ -4,6 +4,7 @@
 #include "../abstract_ui.h"
 #include <dmtimer.h>
 #include "tools/delayed_executor.h"
+#include "ui/quantizer_ui/quantizer_ui.h"
 
 
 
@@ -14,34 +15,43 @@
 class ArpeggiatorUI : public AbstractUI
 {
 private:
-    //DMTimer _tmrNoteDuration;
     bool _isPlaying = false;
     DelayedExecutor delayedExecGate;
+    QuantizerUI *quantizer = NULL;
+
+    DMTimer _tmrClock;
 
 public:
     //Properties:
     int numSteps = 8;
-    float arpVoltages[MAX_ARPEGGIATOR_STEPS];
-    int arpDurations[MAX_ARPEGGIATOR_STEPS];
+    float arpPitchOffsets[MAX_ARPEGGIATOR_STEPS];
+    float arpDurations[MAX_ARPEGGIATOR_STEPS];
+    float bpm = 120;
     uint8_t outputGateIndex = 0;
 
     int currentPosition = 0;
+    int currentEditPosition = 0;
 
 
     //Methods:
     ArpeggiatorUI();
     void draw();
-    
+    void drawBar(int stepIndex, int left, int topY, int barWidth, int barHeight);
     void handleIO();
     
+    bool isAtEnd() { return currentPosition == numSteps - 1;}
+
     void onExit();
     void onEnter();
 
     void handleGateIRQ(uint8_t channel, bool state);
-    
+    void playNote();
     void playNote(uint8_t channel, float voltage, int duration_us);
     void runSequence();
-    void playAndNext();
+    
+
+    void changeStepVoltage(int position, int direction, int rpm);
+    void changeStepDuration(int position, int direction);
 };
 
 static ArpeggiatorUI arpeggiatorUI;
