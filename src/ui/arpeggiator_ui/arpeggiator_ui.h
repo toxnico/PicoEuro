@@ -23,7 +23,8 @@ private:
 
 public:
     //Properties:
-    int numSteps = 8;
+    int stepCount = 8;
+    int playedStepsCount = 0;
     float arpPitchOffsets[MAX_ARPEGGIATOR_STEPS];
     float arpDurations[MAX_ARPEGGIATOR_STEPS];
     float bpm = 120;
@@ -32,6 +33,7 @@ public:
     int currentPosition = 0;
     int currentEditPosition = 0;
 
+    bool isGateOpen = true;
 
     //Methods:
     ArpeggiatorUI();
@@ -39,19 +41,24 @@ public:
     void drawBar(int stepIndex, int left, int topY, int barWidth, int barHeight);
     void handleIO();
     
-    bool isAtEnd() { return currentPosition == numSteps - 1;}
+    bool isAtEnd() { return playedStepsCount >= stepCount;}
 
     void onExit();
     void onEnter();
 
     void handleGateIRQ(uint8_t channel, bool state);
-    void playNote();
-    void playNote(uint8_t channel, float voltage, int duration_us);
-    void runSequence();
+    void openGateFor(int duration_us);
+    void finishNote(bool goToNextPosition);
+    //void playNoteThenMove();
+    //void playNote(uint8_t channel, float voltage, int duration_us);
+    //void runSequence();
+
+    void reset();
+    void moveNext();
     
 
     void changeStepVoltage(int position, int direction, int rpm);
-    void changeStepDuration(int position, int direction);
+    void changeStepDuration(int position, int direction, int rpm);
 };
 
 static ArpeggiatorUI arpeggiatorUI;

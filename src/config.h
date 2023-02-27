@@ -11,7 +11,7 @@
 #define DEBUG_FIRST_PCB 0
 
 // For development purpose : replaces both CV inputs with the pot value, mapped between 0 and +5v
-#define USE_POT_AS_QUANTIZER_INPUT 1
+#define USE_POT_AS_QUANTIZER_INPUT 0
 
 
 // Depending on the encoder, it could be helpful to reverse this : 1 or -1

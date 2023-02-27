@@ -46,7 +46,6 @@ void ArpeggiatorUI::drawBar(int stepIndex, int left, int topY, int barWidth, int
     {
         auto barOffset = left + (barWidth / 2);
         disp->fillTriangle(left + (barWidth / 2), 63 - barHeight - 4, barOffset - 2, 63 - barHeight - 6, barOffset + 2, 63 - barHeight - 6, WHITE);
-
     }
 
     // draw a line over the edided bar:
@@ -62,17 +61,17 @@ void ArpeggiatorUI::draw()
     disp->setTextSize(1);
     disp->setCursor(0, 10);
 
-    disp->print("ARPEGGIATOR");
+    // disp->print("ARPEGGIATOR");
 
-    disp->setCursor(0, 17);
-    disp->printf("POS: %d\nVOLTAGE: %.3f", currentEditPosition, arpPitchOffsets[currentEditPosition]);
+    // disp->setCursor(0, 17);
+    disp->printf("VOLTAGE: %.3f\nDURATION: %.3f", arpPitchOffsets[currentEditPosition], (float)arpDurations[currentEditPosition] / 1000.0);
 
     // draw the steps:
     int barWidth = 5;
     int barMargin = 3;
     int barHeight = 30;
 
-    for (uint8_t i = 0; i < numSteps; i++)
+    for (uint8_t i = 0; i < stepCount; i++)
     {
         auto left = i * (barWidth + barMargin);
         drawBar(i, left, 32, barWidth, barHeight);
@@ -88,56 +87,70 @@ void ArpeggiatorUI::draw()
     io()->setLedBottomButton(io()->btnBottom->isPressed());
 }
 
+void ArpeggiatorUI::reset()
+{
+    this->currentPosition = 0;
+    this->playedStepsCount = 0;
+    Serial.println("Reset");
+}
+
+void ArpeggiatorUI::moveNext()
+{
+    this->currentPosition++;
+    this->playedStepsCount++;
+    Serial.println("Moved next");
+}
+
 void ArpeggiatorUI::handleGateIRQ(uint8_t channel, bool state)
 {
-    //if we get a rising edge on gate 0, we reset the current position
-    // to relaunch the playing process:
-    if(channel == 0 && state)
+    // if we get a rising edge on gate 0, we reset the current position
+    //  and relaunch the playing process:
+    if (channel == 0 && state)
     {
-        this->currentPosition = 0;
-        //we have to play it now:
-        playNote();
-
-        //and resync the timer
-        _tmrClock.reset();
+        reset();
+        finishNote(false);
+        return;
     }
 
     // Rising edge on clock input ? Play note
     if (channel == 1 && state)
     {
-        playNote();
+        // is gate already opened ? we directly go the the next one
+        if (this->isGateOpen)
+        {
+            if (playedStepsCount < stepCount - 1)
+            {
+
+                moveNext();
+                finishNote(false);
+                delayedExecGate.cancel();
+                openGateFor(arpDurations[currentPosition]);
+            }
+        }
+        else
+        {
+
+            if (!isAtEnd())
+            {
+                //finishNote();
+                
+                openGateFor(this->arpDurations[currentPosition]);
+            }
+            // playNoteThenMove();
+        }
     }
 }
 
-void ArpeggiatorUI::runSequence()
+void ArpeggiatorUI::openGateFor(int duration_us)
 {
-    this->_isPlaying = true;
-}
-/*
-void ArpeggiatorUI::playAndNext()
-{
-    auto voltage = this->arpPitchOffsets[currentPosition];
-    playNote(voltage, 0, 500000);
-}
-*/
-
-void ArpeggiatorUI::playNote()
-{
-    if (delayedExecGate.isWaitingForExecution())
-    {
-        this->currentPosition++;
-    }
-    this->playNote(0, this->arpPitchOffsets[currentPosition], this->arpDurations[currentPosition]);
-}
-
-void ArpeggiatorUI::playNote(uint8_t channel, float voltage, int duration_us)
-{
-    if(isAtEnd())
-        return;
-
-    // set output gate high:
+    // set output gate low then high, so external envelopes can be retriggered :
+    //io()->setGateOut(outputGateIndex, 0);
     io()->setGateOut(outputGateIndex, 1);
     io()->setLedLeft(1);
+    this->isGateOpen = true;
+
+    Serial.printf("Gate opened for %d us. step %d / %d\n", duration_us, playedStepsCount, stepCount);
+
     delayedExecGate.executeAfter(duration_us);
 }
 
@@ -157,22 +170,50 @@ void ArpeggiatorUI::changeStepVoltage(int position, int direction, int rpm)
     this->arpPitchOffsets[position] = newVoltage;
 }
 
-void ArpeggiatorUI::changeStepDuration(int position, int direction)
+void ArpeggiatorUI::changeStepDuration(int position, int direction, int rpm)
 {
+    auto increment = direction * 1000;
+    if (rpm > 300)
+        increment *= 50;
+    this->arpDurations[position] += increment;
+}
+
+void ArpeggiatorUI::finishNote(bool goToNextPosition)
+{
+    Serial.println("note finished");
+    io()->setGateOut(outputGateIndex, 0);
+    io()->setLedLeft(0);
+    this->isGateOpen = false;
+    // this->playedStepsCount++;
+    if(goToNextPosition)
+    {
+        if (!isAtEnd())
+            moveNext();
+    }
 }
 
 void ArpeggiatorUI::handleIO()
 {
     handleEncoderLongPressToGoBack();
 
+    // check if the output gate must be set to zero:
+    delayedExecGate.update();
+    if (delayedExecGate.isTimeElapsed())
+    {
+        finishNote(true);
+    }
+
     // encoder turning:
     auto dir = (int)io()->enc->getDirection() * ENCODER_DIRECTION;
     auto rpm = io()->enc->getRPM();
 
-
-    auto rawVoltage = this->arpPitchOffsets[currentPosition] + io()->cvInVolts[0];
-    auto quantizedVoltage = quantizer->rawVoltageToQuantizedVoltage(rawVoltage);
-    io()->setCVOut(quantizedVoltage, 0, this->calibrations);
+    // adjust the output pitch
+    if (currentPosition < this->stepCount)
+    {
+        auto rawVoltage = this->arpPitchOffsets[currentPosition] + io()->cvInVolts[0];
+        auto quantizedVoltage = quantizer->rawVoltageToQuantizedVoltage(rawVoltage);
+        io()->setCVOut(quantizedVoltage, 0, this->calibrations);
+    }
 
     while (true)
     {
@@ -182,55 +223,47 @@ void ArpeggiatorUI::handleIO()
             this->changeStepVoltage(this->currentEditPosition, dir, rpm);
             break;
         }
+
         if (io()->btnBottom->isPressed() && dir != 0)
         {
-            this->changeStepDuration(this->currentEditPosition, dir);
+            this->changeStepDuration(this->currentEditPosition, dir, rpm);
             break;
         }
 
-        auto newPos = this->currentPosition + dir;
-        if (newPos < 0)
-            newPos = numSteps - 1;
-        if (newPos > numSteps - 1)
-            newPos = 0;
+        if (io()->btnEnc->isPressed() && dir != 0)
+        {
+            if (dir < 0 && this->stepCount > 1)
+                this->stepCount--;
 
-        this->currentPosition = newPos;
+            if (dir > 0 && this->stepCount < MAX_ARPEGGIATOR_STEPS)
+                this->stepCount++;
+            // this->changeStepDuration(this->currentEditPosition, dir, rpm);
+            break;
+        }
+
         break;
     }
 
-    // encoder click (for testing)
+    // TESTING: encoder click plays the current note for the given duration
     if (io()->btnEnc->pressed())
     {
-        // Serial.println("P01");
-        playNote(/*0, arpPitchOffsets[currentPosition], arpDurations[currentPosition]*/);
+        handleGateIRQ(1, true);
+        handleGateIRQ(1, false);
     }
 
     if (io()->btnBottom->pressed())
     {
+        handleGateIRQ(0, true);
+        handleGateIRQ(0, false);
         // reset position:
-        this->currentPosition = 0;
+        // this->currentPosition = 0;
     }
 
-    delayedExecGate.update();
-    if (delayedExecGate.isTimeElapsed())
-    {
-        io()->setGateOut(outputGateIndex, false);
-        io()->setLedLeft(0);
+    // if(_tmrClock.isTimeReached())
+    //     playNote();
 
-        // Increment the current position after the note is played.
-        // Using a temp variable to avoid bad stuff while drawing
-        // (don't forget that the variable is shared between 2 cores)
-        auto newPos = currentPosition + 1;
-        if (newPos > this->numSteps - 1)
-            newPos = 0;
-        currentPosition = newPos;
-    }
-
-    if(_tmrClock.isTimeReached())
-        playNote();
-
-    //read the current edited position:
-    this->currentEditPosition = map(io()->potValue, 0, 4095, 0, this->numSteps - 1);
+    // read the current edited position:
+    this->currentEditPosition = map(io()->potValue, 0, 4095, 0, this->stepCount - 1);
 }
 
 void ArpeggiatorUI::onExit()
@@ -243,12 +276,15 @@ void ArpeggiatorUI::onEnter()
     // initialize the quantizer:
     this->quantizer = (QuantizerUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER);
     this->quantizer->initVoltages(this->quantizer->currentScale());
-    randomSeed(io()->cvIn[0]);
+    randomSeed(6000);
+    this->stepCount = 8;
     // for testing : default arp notes & durations
     for (int i = 0; i < MAX_ARPEGGIATOR_STEPS; i++)
     {
-        this->arpDurations[i] = 100000;
-        //this->arpPitchOffsets[i] = i * 0.3;
+        this->arpDurations[i] = 500000;
+        // this->arpPitchOffsets[i] = i * 0.3;
         this->arpPitchOffsets[i] = (float)random(0, 2500) / 1000.0;
     }
+
+    reset();
 }
