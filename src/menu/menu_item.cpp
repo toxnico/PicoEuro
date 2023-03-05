@@ -43,7 +43,22 @@ void MenuItem::toString(char *buff)
 
     if (type == ValueType::Int)
     {
-        sprintf(buff, "%s : %d", name, getValueInt());
+        if(this->labels == NULL)
+        {
+            sprintf(buff, "%s : %d", name, getValueInt());
+        }
+        else
+        {
+            char upper[30];
+            memset(upper, 0, 30);
+            int len = strlen(this->labels[getValueInt()]);
+            for (int i = 0; i < len; i++)
+            {
+                upper[i] = toUpperCase(this->labels[getValueInt()][i]);
+            }
+            
+            sprintf(buff, "%s: %s", name, this->labels[getValueInt()]);
+        }
     }
 
     if (type == ValueType::OnOff)

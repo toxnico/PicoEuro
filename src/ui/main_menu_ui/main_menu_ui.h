@@ -32,7 +32,6 @@ public:
     void onEnter();
     void onExit();
 
-    
 };
 
 static MainMenuUI mainMenuUI;

@@ -7,12 +7,12 @@
 #include "io/iomanager.h"
 #include "ui/uimanager.h"
 #include "note.h"
-
+#include "tools/tools.h"
 QuantizerUI::QuantizerUI()
 {
     //this->init(disp, state);
     this->id = UI_QUANTIZER;
-    this->_currentScaleIndex = 11;
+    this->currentScaleIndex = 11;
     
     this->linkedMenuUI = UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);
 }
@@ -41,10 +41,10 @@ void QuantizerUI::draw()
     disp->setTextSize(1);
     disp->setCursor(0, 10);
 
-    auto name = scale_names[_currentScaleIndex];
-    // Serial.println(_currentScaleIndex);
+    auto name = scale_names[currentScaleIndex];
+    // Serial.println(currentScaleIndex);
     char scaleName[32];
-    strcpy(scaleName, scale_names[_currentScaleIndex]);
+    strcpy(scaleName, scale_names[currentScaleIndex]);
     for (int i = 0; i < strlen(scaleName); i++)
     {
         scaleName[i] = toUpperCase(scaleName[i]);
@@ -168,36 +168,9 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
     }
 }
 
-/**
- * @brief Returns the index of num (more or less tolerance) 
- *        in the array arr, of a given size.
- * 
- * @param num 
- * @param tolerance 
- * @param arr 
- * @param size 
- * @return int 
- */
-int QuantizerUI::indexOf(int num, int tolerance, int16_t *arr, int size)
-{
-    for(int i=0;i<size;i++)
-    {
-        int delta = abs(arr[i] - num);
 
-        if(delta <= tolerance)
-            return i;
 
-    }
-    return -1;
-}
 
-int QuantizerUI::voltsToScaleUnits(float voltage)
-{
-    // remove the octave :
-    float fractionalPart = voltage - floor(voltage);
-
-    return (int)(fractionalPart * 1536.0);
-}
 
 /**
  * @brief Takes a voltage, and returns a quantified value according to the internal voltages[] array
@@ -289,11 +262,11 @@ void QuantizerUI::handleIO()
 
     // The encoder changes the current scale index
     int delta = (int)io()->enc->getDirection() * ENCODER_DIRECTION;
-    this->_currentScaleIndex = constrain(_currentScaleIndex + delta, 0, braids::scaleCount - 1);
+    this->currentScaleIndex = constrain(currentScaleIndex + delta, 0, braids::scaleCount - 1);
 
     if (delta != 0)
     {
-        initVoltages(braids::scales[_currentScaleIndex]);
+        initVoltages(braids::scales[currentScaleIndex]);
     }
 
     auto start = micros();

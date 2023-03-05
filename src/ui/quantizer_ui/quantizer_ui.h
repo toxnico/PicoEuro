@@ -26,12 +26,12 @@ class QuantizerUI : public AbstractUI
 {
 private:
 
-    int _currentScaleIndex = 0;
     float voltages[16];
     uint64_t _lastConversionDuration_us = 0;
 
 public:
-    inline braids::Scale currentScale() { return braids::scales[_currentScaleIndex]; }
+    int currentScaleIndex = 0;
+    inline braids::Scale currentScale() { return braids::scales[currentScaleIndex]; }
     //Properties:
     QuantificationMode_t quantificationMode = QuantificationMode_t::Continuous;
 
@@ -47,8 +47,8 @@ public:
     void handleGateIRQ(uint8_t channel, bool state);
     
     const char* getNoteName(float voltage);
-    int indexOf(int num, int tolerance, int16_t *arr, int size);
-    int voltsToScaleUnits(float voltage);
+    //int indexOf(int num, int tolerance, int16_t *arr, int size);
+    //int voltsToScaleUnits(float voltage);
     float rawVoltageToQuantizedVoltage(float rawVoltage);
 
     // initialize the voltage values from the scale

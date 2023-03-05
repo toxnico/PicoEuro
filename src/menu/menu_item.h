@@ -34,6 +34,12 @@ public:
 	const char *name;
 
 	/**
+	 * @brief List of labels, so ve can display custom text in case of an Int menu item.
+	 * 
+	 */
+	const char * const* labels = NULL;
+
+	/**
 	 * @brief Type of value
 	 */ 
 	ValueType type;

@@ -1,6 +1,7 @@
 #include "quantizer_menu_ui.h"
 #include "ui/quantizer_ui/quantizer_ui.h"
 #include "ui/uimanager.h"
+#include "ui/quantizer_ui/o_c_scale_names.h"
 
 QuantizerMenuUI::QuantizerMenuUI()
 {
@@ -43,6 +44,11 @@ void QuantizerMenuUI::handleIO()
     if (io()->btnEnc->pressed())
     {
         menu->getSelectedChild()->isEditing = !menu->getSelectedChild()->isEditing;
+        //if we finished editing, we can save into the eeprom
+        if(!menu->getSelectedChild()->isEditing)
+        {
+            this->save();
+        }
         return;
     }
 
@@ -91,12 +97,28 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
     strcpy(quantizationMode->choices[0], "CONTINUOUS");
     strcpy(quantizationMode->choices[1], "SAMPLE & HOLD");
 
-    //auto q = quantizer;
+
     quantizationMode->changeCallback = [](MenuItem *sender)
     {
         auto quantizer_ui = (QuantizerUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER);
         quantizer_ui->quantificationMode = (QuantificationMode_t)sender->getValueInt();
     };
+
+    auto scale = new MenuItem(MENU_DEFAULT_SCALE);
+    scale->type = ValueType::Int;
+    scale->minimum = 0;
+    scale->maximum = braids::scaleCount - 1;
+    scale->labels = scale_names;
+    scale->changeCallback = [](MenuItem *sender)
+    {
+        auto quantizer_ui = (QuantizerUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER);
+        int scaleIndex = (QuantificationMode_t)sender->getValueInt();
+        quantizer_ui->currentScaleIndex = scaleIndex;
+    };
+
+
+    strcpy(quantizationMode->choices[0], "CONTINUOUS");
+    strcpy(quantizationMode->choices[1], "SAMPLE & HOLD");
 
     // Input trigger delay:
     //auto triggerDelay = new MenuItem(MENU_TRIGGER_DELAY);
@@ -111,6 +133,7 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
     //};
 
     root->addChild(quantizationMode);
+    root->addChild(scale);
     //root->addChild(triggerDelay);
 
     m->setRootItem(root);
@@ -122,22 +145,29 @@ void QuantizerMenuUI::save()
 {
     QuantizerMenuUISave_t s;
     s.mode = menu->root->findByName(MENU_MODE)->getValueInt();
+    s.defaultScale = menu->root->findByName(MENU_DEFAULT_SCALE)->getValueInt();
     //s.delay_us = menu->root->findByName(MENU_TRIGGER_DELAY)->getValueInt();
     EEPROM.put<QuantizerMenuUISave_t>(this->saveAddress, s);
     if(!EEPROM.commit())
         Serial.println("EEPROM write error");
 
-    io()->setLedBottomButton(1);
-    delay(100);
-    io()->setLedBottomButton(0);
+    //io()->setLedBottomButton(1);
+    //delay(100);
+    //io()->setLedBottomButton(0);
+
 }
 
 void QuantizerMenuUI::load()
 {
+    
     QuantizerMenuUISave_t s;
     EEPROM.get<QuantizerMenuUISave_t>(this->saveAddress, s);
 
+    Serial.printf("mode: %d\ndefault scale: %d", s.mode, s.defaultScale);
+
     menu->root->findByName(MENU_MODE)->setValueInt(s.mode);
+    if(s.defaultScale < braids::scaleCount)
+        menu->root->findByName(MENU_DEFAULT_SCALE)->setValueInt(s.defaultScale);
     //menu->root->findByName(MENU_TRIGGER_DELAY)->setValueInt(s.delay_us);
 
     //Apply these settings to the Quantizer itself

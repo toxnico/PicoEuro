@@ -11,6 +11,8 @@
  */
 typedef struct QuantizerMenuUISave_t{
     uint8_t mode = 0;
+    uint8_t defaultScale = 0;
+    uint8_t RESERVED[8];
     //uint32_t delay_us = 0;
 } QuantizerMenuUISave_t;
 
@@ -23,6 +25,7 @@ class QuantizerMenuUI : public AbstractUI
 {
 private:
     const char* MENU_MODE = "MODE";
+    const char* MENU_DEFAULT_SCALE = "SCALE";
     //const char* MENU_TRIGGER_DELAY = "TRIG. DELAY US";
 
 

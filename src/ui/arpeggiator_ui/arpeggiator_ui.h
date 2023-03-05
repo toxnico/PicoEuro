@@ -35,10 +35,14 @@ public:
 
     bool isGateOpen = true;
 
+    float cvIn[2] = {0,0};
+    
+
     //Methods:
     ArpeggiatorUI();
     void draw();
     void drawBar(int stepIndex, int left, int topY, int barWidth, int barHeight);
+    void drawBarOld(int stepIndex, int left, int topY, int barWidth, int barHeight);
     void handleIO();
     
     bool isAtEnd() { return playedStepsCount >= stepCount;}

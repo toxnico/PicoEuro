@@ -132,12 +132,26 @@ MenuDisplay *MainMenuUI::buildMenu()
     auto output_calibration = new MenuItem(_output_calibration);
     output_calibration->type = ValueType::None;
 
+
+
+
     root->addChild(quantizer);
     root->addChild(quantizer_opts);
     root->addChild(arpeggiator);
     root->addChild(general_state);
     root->addChild(input_calibration);
     root->addChild(output_calibration);
+    
+    //tests for overflow management
+    //root->addChild(quantizer);
+    //root->addChild(general_state);
+    //root->addChild(quantizer);
+    //root->addChild(general_state);
+    //root->addChild(quantizer);
+    //root->addChild(general_state);
+    //root->addChild(quantizer);
+    //root->addChild(general_state);
+
 
     m->setRootItem(root);
     m->selectedIndex = 0;

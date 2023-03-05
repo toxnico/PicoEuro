@@ -14,20 +14,7 @@ MenuDisplay::MenuDisplay(Adafruit_GFX *disp)
  */
 void MenuDisplay::updateChildrenVisibilityMainMenu()
 {
-    /*
-    // Mode audio? -> active MENU_ACCEPT_MIDI et désactive MENU_SYNCHRO
-    int mode = this->root->findByName(MENU_MODE)->getValueInt();
-
-    this->root->findByName(MENU_ACCEPT_MIDI)->isVisible = (mode == MODE_AUDIO);
-    this->root->findByName(MENU_SYNCHRO)->isVisible = (mode == MODE_LFO);
-    this->root->findByName(MENU_FREQUENCY_UNIT)->isVisible = (mode == MODE_LFO || mode == MODE_AUDIO);
-
-    // envelope counters:
-    this->root->findByName(MENU_ENV_CNT_1)->isVisible = (mode == MODE_ENVELOPES);
-    this->root->findByName(MENU_ENV_CNT_2)->isVisible = (mode == MODE_ENVELOPES);
-    this->root->findByName(MENU_ENV_CNT_3)->isVisible = (mode == MODE_ENVELOPES);
-    this->root->findByName(MENU_ENV_CNT_4)->isVisible = (mode == MODE_ENVELOPES);
-    */
+    
 }
 
 void MenuDisplay::draw()
@@ -37,31 +24,51 @@ void MenuDisplay::draw()
     oled->clearDisplay();
 
     // title:
-    MenuItem *item = this->root;
+    //MenuItem *root = this->root;
 
-    if(!item)
+    if(!root)
         return;
 
-    this->disp->setCursor((128 - Graphics::getTextWidth((char *)item->name, oled)) / 2, 7);
-    disp->print(item->name);
+    this->disp->setCursor((128 - Graphics::getTextWidth((char *)root->name, oled)) / 2, 7);
+    disp->print(root->name);
 
-/*
-    if(this->root->findByName(MENU_MODE))
-        updateChildrenVisibilityMainMenu();
-*/
+    //show scrolling indicator : bottom
+    if(this->hasItemsBelow())
+    {
+        auto x = 115;
+        auto y = 5;
+        disp->fillTriangle(x, y, x+6, y, x+3, y+3, WHITE);
+    }
+
+    //show scrolling indicator : top
+    if(this->hasItemsAbove())
+    {
+        auto x = 115;
+        auto y = 3;
+        disp->fillTriangle(x, y, x+6, y, x+3, y-3, WHITE);
+    }
+
+    //Scrolling management : down
+    if(selectedIndex > firstVisibleItem + maxVisibleItems-1)
+        firstVisibleItem++;
+
+    //Scrolling management : up
+    if(selectedIndex < firstVisibleItem)
+        firstVisibleItem--;
+
 
     // children:
-    uint8_t spaceBetweenItems = 3;
+    uint8_t spaceBetweenItems = 4;
 
     uint8_t visibleChildrenCount = 0;
 
-    for (int i = 0; i < item->childrenCount; i++)
+    for (int i = firstVisibleItem; i < min(firstVisibleItem+ maxVisibleItems, root->childrenCount); i++)
     {
-        MenuItem *itm = item->children[i];
+        MenuItem *itm = root->children[i];
         if (!itm->isVisible)
             continue;
 
-        int y = visibleChildrenCount * (5 + spaceBetweenItems) + 18;
+        int y = visibleChildrenCount * (5 + spaceBetweenItems) + 17;
         itm->draw(disp, y, i == selectedIndex);
 
         visibleChildrenCount++;

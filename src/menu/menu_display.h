@@ -20,6 +20,8 @@ private:
     Adafruit_GFX* disp = NULL;
 public:
     int8_t selectedIndex = 0;
+
+    int8_t firstVisibleItem = 0;
 	int8_t maxVisibleItems = 6;
 
 	
@@ -45,6 +47,8 @@ public:
         return NULL;
     }
 
+    inline bool hasItemsBelow() { return root->childrenCount > this->firstVisibleItem + this->maxVisibleItems; }
+    inline bool hasItemsAbove() { return firstVisibleItem > 0; }
 };
 
 

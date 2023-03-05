@@ -92,6 +92,6 @@
 #define UI_ARPEGGIATOR "ARPEGGIATOR"
 
 //This is the UI we want to load at startup:
-#define UI_STARTUP UI_ARPEGGIATOR
+#define UI_STARTUP UI_MAIN_MENU
 
 #endif // CONFIG_H
