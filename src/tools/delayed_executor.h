@@ -55,7 +55,7 @@ public:
     /**
      * @brief Indicates if it's time to run the stuff.
      * If it's time, it will return true.
-     * Flags are disabled before it returns true, so another call right after will return false!
+     * Flags are disabled before after this call, so another call right after will return false!
      * 
      * @return true if it's time !
      * 

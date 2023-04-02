@@ -88,7 +88,7 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
 {
     MenuDisplay *m = new MenuDisplay(this->disp);
 
-    auto root = new MenuItem("QUANTIZER MENU");
+    auto root = new MenuItem("QUANT/ARP OPTIONS");
 
     // Quantization mode:
     auto quantizationMode = new MenuItem(MENU_MODE);
@@ -116,9 +116,26 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
         quantizer_ui->currentScaleIndex = scaleIndex;
     };
 
-
     strcpy(quantizationMode->choices[0], "CONTINUOUS");
     strcpy(quantizationMode->choices[1], "SAMPLE & HOLD");
+
+    auto direction = new MenuItem(MENU_DIRECTION);
+    direction->type = ValueType::Choice;
+    direction->choicesCount = 3;
+    
+    /*
+    scale->changeCallback = [](MenuItem *sender)
+    {
+        auto quantizer_ui = (QuantizerUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER);
+        int scaleIndex = (QuantificationMode_t)sender->getValueInt();
+        quantizer_ui->currentScaleIndex = scaleIndex;
+    };
+    */
+
+    strcpy(direction->choices[0], "FORWARD");
+    strcpy(direction->choices[1], "REVERSE");
+    strcpy(direction->choices[2], "RANDOM");
+
 
     // Input trigger delay:
     //auto triggerDelay = new MenuItem(MENU_TRIGGER_DELAY);
@@ -134,6 +151,7 @@ MenuDisplay *QuantizerMenuUI::buildMenu()
 
     root->addChild(quantizationMode);
     root->addChild(scale);
+    root->addChild(direction);
     //root->addChild(triggerDelay);
 
     m->setRootItem(root);

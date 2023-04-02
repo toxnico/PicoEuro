@@ -44,8 +44,10 @@ public:
 
     float cvInVolts[ANALOG_INPUTS_COUNT];
 
-    uint16_t maxCvIn0 = 0;
-    uint16_t maxCvIn1 = 0;
+
+
+    //uint16_t maxCvIn0 = 0;
+    //uint16_t maxCvIn1 = 0;
 
     //uint8_t gateIn0 = 0;
     //uint8_t gateIn1 = 0;

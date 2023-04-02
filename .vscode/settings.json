@@ -23,6 +23,7 @@
         "random": "cpp",
         "optional": "cpp",
         "new": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "ranges": "cpp"
     }
 }

@@ -94,12 +94,12 @@ void IOManager::updateInputs()
     this->cvInVolts[0] = this->inputLinReg[0].a * (float)this->cvIn[0] + this->inputLinReg[0].b;
     this->cvInVolts[1] = this->inputLinReg[1].a * (float)this->cvIn[1] + this->inputLinReg[1].b;
 #endif
-
+/*
     // to display the CV input blank values:
     if (this->cvIn[0] > this->maxCvIn0)
         this->maxCvIn0 = this->cvIn[0];
     if (this->cvIn[1] > this->maxCvIn1)
-        this->maxCvIn1 = this->cvIn[1];
+        this->maxCvIn1 = this->cvIn[1];*/
 }
 
 void IOManager::setLedTop(uint8_t channel, bool state)

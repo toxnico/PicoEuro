@@ -26,6 +26,7 @@ class QuantizerMenuUI : public AbstractUI
 private:
     const char* MENU_MODE = "MODE";
     const char* MENU_DEFAULT_SCALE = "SCALE";
+    const char* MENU_DIRECTION = "DIRECTION";
     //const char* MENU_TRIGGER_DELAY = "TRIG. DELAY US";
 
 
