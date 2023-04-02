@@ -59,6 +59,13 @@ public:
     }
 };
 
+typedef struct Step_t 
+{
+    int length = 1;
+    int pulseCount = 0;
+    float voltage = 0.0;
+} Step_t;
+
 /**
  * @brief Class for the Arpeggiator's main interface.
  *
@@ -82,8 +89,9 @@ public:
     // Properties:
     int stepCount = 8;
     int playedStepsCount = 0;
-    float arpPitchOffsets[MAX_ARPEGGIATOR_STEPS];
-    float arpDurations[MAX_ARPEGGIATOR_STEPS];
+
+    Step_t steps[MAX_ARPEGGIATOR_STEPS];
+
 
     uint8_t outputGateIndex = 0;
 
@@ -107,14 +115,16 @@ public:
     void onEnter();
 
     void handleGateIRQ(uint8_t channel, bool state);
-    void openGateFor(int duration_us);
+    void openGate(uint8_t channel);
+    void closeGate(uint8_t channel);
     void finishNote(bool goToNextPosition);
     // void playNoteThenMove();
     // void playNote(uint8_t channel, float voltage, int duration_us);
     // void runSequence();
 
     void reset();
-    void moveNext();
+    void next();
+
 
     void changeStepVoltage(int position, int direction, int rpm);
     void changeStepDuration(int position, int direction, int rpm);
