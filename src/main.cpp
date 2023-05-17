@@ -18,7 +18,7 @@
 #include "images/peacock_splash.h"
 #include "ui/uimanager.h"
 #include "eeprom_mapping.h"
-#include <MCP_DAC.h>
+//#include <MCP_DAC.h>
 
 Adafruit_SSD1306 *disp = NULL;
 
@@ -146,7 +146,7 @@ void initUIs()
     ui->onEnter();
   }
 
-  delay(5000);
+  //delay(5000);
   //special one
   vcoUI.begin();
 }

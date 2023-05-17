@@ -24,6 +24,8 @@
         "optional": "cpp",
         "new": "cpp",
         "ostream": "cpp",
-        "ranges": "cpp"
+        "ranges": "cpp",
+        "map": "cpp",
+        "system_error": "cpp"
     }
 }

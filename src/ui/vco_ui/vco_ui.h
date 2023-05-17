@@ -2,14 +2,11 @@
 #define VCO_UI_H
 
 #include "../abstract_ui.h"
-#include "tools/sine_generator.h"
-#include <audio
+#include "generators/sine_generator.h"
 
 class VcoUI : public AbstractUI
 {
-    private:
-    static const int sine_wave_length = 128;
-    int sine_wave[sine_wave_length];
+    
     public:
 
     VcoUI();
