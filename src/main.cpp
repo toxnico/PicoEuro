@@ -13,6 +13,7 @@
 #include "ui/main_menu_ui/main_menu_ui.h"
 #include "ui/eeprom_ui/eeprom_ui.h"
 #include "ui/arpeggiator_ui/arpeggiator_ui.h"
+#include "ui/vco_ui/vco_ui.h"
 #include "io/iomanager.h"
 #include "images/peacock_splash.h"
 #include "ui/uimanager.h"
@@ -129,8 +130,9 @@ void initUIs()
   UIManager::getInstance()->uis[5] = &mainMenuUI;
   UIManager::getInstance()->uis[6] = &eepromUI;
   UIManager::getInstance()->uis[7] = &arpeggiatorUI;
+  UIManager::getInstance()->uis[8] = &vcoUI;
 
-  UIManager::getInstance()->uiCount = 8;
+  UIManager::getInstance()->uiCount = 9;
 
   // load all the UI states from EEPROM:
   for (uint8_t i = 0; i < UIManager::getInstance()->uiCount; i++)
@@ -143,6 +145,10 @@ void initUIs()
     ui->load();
     ui->onEnter();
   }
+
+  delay(5000);
+  //special one
+  vcoUI.begin();
 }
 
 /**

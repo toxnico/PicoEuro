@@ -70,6 +70,8 @@ public:
     void setGateOut2(bool state);
     void setGateOut3(bool state);
 
+    bool getGateOut0();
+
     void setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *calibrations);
 
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);

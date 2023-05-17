@@ -16,13 +16,13 @@ protected:
     //the display interface
     Adafruit_SSD1306 *disp = NULL;
     
-    PeacockCalibrations_t *calibrations = NULL;
 
     // If this UI has a corresponding menu UI, this field
     //  allows direct access to it
     AbstractUI *linkedMenuUI = NULL;
 
 public:
+    PeacockCalibrations_t *calibrations = NULL;
     /**
      * @brief Basic constructor
      *

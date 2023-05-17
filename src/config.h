@@ -90,8 +90,9 @@
 #define UI_MAIN_MENU "MAIN_MENU"
 #define UI_EEPROM "EEPROM"
 #define UI_ARPEGGIATOR "ARPEGGIATOR"
+#define UI_VCO "VCO"
 
 //This is the UI we want to load at startup:
-#define UI_STARTUP UI_ARPEGGIATOR
+#define UI_STARTUP UI_VCO
 
 #endif // CONFIG_H

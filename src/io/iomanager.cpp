@@ -151,6 +151,12 @@ void IOManager::setGateOut(uint8_t channel, bool state)
     }
 }
 
+bool IOManager::getGateOut0()
+{
+    // Gates are inverted electrially, so we need to invert the desired state !
+    return !digitalRead(PIN_GATE_OUT_0);
+}
+
 void IOManager::setGateOut0(bool state)
 {
     // Gates are inverted electrially, so we need to invert the desired state !
