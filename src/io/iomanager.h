@@ -73,7 +73,7 @@ public:
     bool getGateOut0();
 
     void setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *calibrations);
-
+    void setCVOutRaw(int dacValue, uint8_t channel);
     uint16_t analogReadAverage(uint8_t pin, uint8_t sampleCount);
     uint16_t analogReadMedian(uint8_t pin, uint8_t sampleCount);
     void initLinearRegressions(PeacockCalibrations_t *calibrations);

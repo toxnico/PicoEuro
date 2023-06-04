@@ -2,7 +2,7 @@
 #define VCO_UI_H
 
 #include "../abstract_ui.h"
-#include "generators/sine_generator.h"
+#include "generators/generator.h"
 
 class VcoUI : public AbstractUI
 {
@@ -11,7 +11,7 @@ class VcoUI : public AbstractUI
 
     VcoUI();
 
-    SineGenerator sine;
+    Generator *wave = NULL;
     void begin();
     void draw();
     void handleIO();

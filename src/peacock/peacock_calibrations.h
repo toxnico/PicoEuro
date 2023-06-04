@@ -16,6 +16,9 @@ typedef struct PeacockCalibrations_t
     Calibration_t inputCalibrations[INPUT_CALIBRATIONS_COUNT * ANALOG_INPUTS_COUNT];
     Calibration_t outputCalibrations[OUTPUT_CALIBRATIONS_COUNT * ANALOG_OUTPUTS_COUNT];
 
+    //float outputVoltageToIndex[ANALOG_OUTPUTS_COUNT * 4096];
+    //float inputVoltageToIndex[ANALOG_INPUTS_COUNT * 4096];
+
 } PeacockCalibrations_t;
 
 /**

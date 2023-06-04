@@ -184,6 +184,13 @@ void IOManager::setCVOut(float voltage, uint8_t channel, PeacockCalibrations_t *
     // Serial.println(this->currentOutputVoltages[channel]);
 }
 
+void IOManager::setCVOutRaw(int dacValue, uint8_t channel)
+{
+    dac->analogWrite(dacValue, channel);
+    //this->currentOutputVoltages[channel] = voltage;
+    // Serial.println(this->currentOutputVoltages[channel]);
+}
+
 uint16_t IOManager::analogReadAverage(uint8_t pin, uint8_t sampleCount)
 {
     uint32_t sum = 0;

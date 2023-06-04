@@ -8,25 +8,27 @@
 #include "ui/uimanager.h"
 #include "note.h"
 #include "tools/tools.h"
+#include "ui/quantizer_menu_ui/quantizer_menu_ui.h"
+
 QuantizerUI::QuantizerUI()
 {
-    //this->init(disp, state);
+    // this->init(disp, state);
     this->id = UI_QUANTIZER;
     this->currentScaleIndex = 11;
-    
+
     this->linkedMenuUI = UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);
 }
 
-const char* QuantizerUI::getNoteName(float voltage)
+const char *QuantizerUI::getNoteName(float voltage)
 {
     auto scaleValue = voltsToScaleUnits(voltage);
     auto semitoneScale = braids::scales[1];
-    auto idx = indexOf(scaleValue, 0, semitoneScale.notes, semitoneScale.num_notes);
-    
-    if(idx > -1)
+    auto idx = indexOf(scaleValue, 0.0, semitoneScale.notes, semitoneScale.num_notes);
+
+    if (idx > -1)
     {
         auto noteName = note_names[idx];
-        //auto noteNameFr = note_names_fr[idx];
+        // auto noteNameFr = note_names_fr[idx];
         return noteName;
     }
     else
@@ -44,7 +46,7 @@ void QuantizerUI::draw()
     auto name = scale_names[currentScaleIndex];
     // Serial.println(currentScaleIndex);
     char scaleName[32];
-    strcpy(scaleName, scale_names[currentScaleIndex]);
+    sprintf(scaleName, "%s [%s]", name, notes[rootNote()]);
     for (int i = 0; i < strlen(scaleName); i++)
     {
         scaleName[i] = toUpperCase(scaleName[i]);
@@ -63,10 +65,10 @@ void QuantizerUI::draw()
     float q0 = io()->getCurrentOutputVoltage(0);
     disp->printf("%.3f V", q0);
 
-    //print the corresponding note name:
-    disp->setCursor(15,voltagesY +20);
+    // print the corresponding note name:
+    disp->setCursor(15, voltagesY + 20);
     disp->setTextSize(2);
-    disp->print(getNoteName(q0));
+    disp->print(getNoteName(q0 + rootNote() * SEMI_TONE_IN_VOLTS));
     disp->setTextSize(1);
     // channel 1:
     char buff[10];
@@ -75,11 +77,11 @@ void QuantizerUI::draw()
     disp->setCursor(78, voltagesY + 8);
     float q1 = io()->getCurrentOutputVoltage(1);
     disp->printf("%.3f V", q1);
-    
-    //print the corresponding note name:
-    disp->setCursor(78,voltagesY + 20);
+
+    // print the corresponding note name:
+    disp->setCursor(78, voltagesY + 20);
     disp->setTextSize(2);
-    disp->print(getNoteName(q1));
+    disp->print(getNoteName(q1 + rootNote() * SEMI_TONE_IN_VOLTS));
     disp->setTextSize(1);
 
     // Gauges
@@ -143,7 +145,6 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
     for (int i = 0; i < this->currentScale().num_notes; i++)
     {
         auto y = voltages[i] * voltFractionToScreenY;
-
         disp->drawLine(left, bottom - y, left + boxWidth - 1, bottom - y, WHITE);
     }
 
@@ -167,10 +168,6 @@ void QuantizerUI::drawGauge(uint16_t x, float voltage, float quantifiedVoltage, 
         disp->fillRect(left, bottom - voltage * voltFractionToScreenY, gaugeWidth, voltage * voltFractionToScreenY, WHITE);
     }
 }
-
-
-
-
 
 /**
  * @brief Takes a voltage, and returns a quantified value according to the internal voltages[] array
@@ -278,23 +275,6 @@ void QuantizerUI::handleIO()
         quantizeChannelAndSendToCVOut(1);
     }
 
-    /*
-        //Check the delayedExecutors, to switch the output gates back off
-        for(uint8_t i = 0;i<ANALOG_OUTPUTS_COUNT;i++)
-        {
-            delayedExecutors_lowerGates[i].update();
-
-            if(delayedExecutors_lowerGates[i].isTimeElapsed())
-            {
-                io()->setGateOut(i, 0);
-                IOManager::getInstance()->setLedTop(i, 0);
-                //if(i == 0)
-                //    IOManager::getInstance()->setLedLeft(0);
-                //if(i == 1)
-                //    IOManager::getInstance()->setLedRight(0);
-            }
-        }
-      */
     auto end = micros();
 
     _lastConversionDuration_us = end - start;
@@ -319,7 +299,40 @@ void QuantizerUI::onEnter()
 {
     initVoltages(this->currentScale());
 
-    dumpCalibrations(calibrations);
+    // dumpCalibrations(calibrations);
+}
+
+int QuantizerUI::rootNote()
+{
+    /*
+    static int previousRoot = -1;
+    int root = map(io()->potValue, 0, 4095, 0, 11);
+
+    if(root != previousRoot)
+    {
+        previousRoot = root;
+        initVoltages(this->currentScale());
+    }
+
+    return root;
+    */
+    auto menuUI = (QuantizerMenuUI *)UIManager::getInstance()->getUIById(UI_QUANTIZER_MENU);
+    int rootNote = menuUI->menu->root->findByName(menuUI->MENU_ROOT_NOTE)->getValueInt();
+    return rootNote;
+}
+
+int cmp(const void *a, const void *b)
+{
+    float f_a = *(float*)a;
+    float f_b = *(float*)b;
+
+
+    if(f_a < f_b)
+        return -1;
+    if(f_a > f_b)
+        return 1;
+
+    return 0;
 }
 
 /**
@@ -333,14 +346,43 @@ void QuantizerUI::initVoltages(braids::Scale scale)
     // This means that 1 volt equals 128*12=1536 units.
     // 1536 -> 1v
     // x    -> (x/1535) v
-
+    Serial.println("initVoltages() - before offset:");
     for (uint8_t i = 0; i < scale.num_notes; i++)
     {
         this->voltages[i] = (float)scale.notes[i] / 1535.0;
-        Serial.printf("%.3f, ", this->voltages[i]);
+        // Serial.printf("%.3f, ", this->voltages[i]);
     }
-    Serial.println();
+    // Serial.println();
+
+    // Offset the scale according to the root note:
+
+    int root = this->rootNote();
+    
+    float offsetVoltages[16];
+    Serial.printf("Offsetting by %d (%.3f volts)\n", root, root * SEMI_TONE_IN_VOLTS);
+    for (uint8_t i = 0; i < scale.num_notes; i++)
+    {
+        float oldVoltage = voltages[i];
+        float newVoltage = voltages[i] - ((float)root * SEMI_TONE_IN_VOLTS);
+
+        if (newVoltage < 0)
+            newVoltage = 1.0 + newVoltage;
+
+        if(newVoltage == 1.0)
+            newVoltage = 0.0;
+
+        voltages[i] = newVoltage;
+
+        Serial.printf("%.3f -> %.3f\n", oldVoltage, newVoltage);
+    }
+
+    qsort(voltages, scale.num_notes, sizeof(float), cmp);
+    Serial.println("After qsort");
+    for (uint8_t i = 0; i < scale.num_notes; i++)
+    {
+        Serial.printf("%d : %.3f\n", i, voltages[i]);
+    }
 }
 
 // Default instance
-//QuantizerUI quantizerUI;
+// QuantizerUI quantizerUI;

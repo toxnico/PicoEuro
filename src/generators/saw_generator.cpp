@@ -1,5 +1,5 @@
 #include "saw_generator.h"
-float SawGenerator::getSample()
+int SawGenerator::getSample()
 {
     if (position > samplesPerCycle - 1)
         position = 0;
@@ -16,14 +16,14 @@ float SawGenerator::getSample()
 void SawGenerator::initLUT(int size)
 {
     this->lutSize = size;
-    this->lut = (float *)malloc(lutSize * sizeof(float));
+    this->lut = (int *)malloc(lutSize * sizeof(int));
     
     //y = a * x + b
-    float a = 2.0 / (lutSize - 1);
-    float b = -1.0;
+    float a = 4095 / (lutSize - 1);
+    //float b = -1.0;
 
     for (int i = 0; i < lutSize; i++)
     {
-        this->lut[i] = a * i + b;
+        this->lut[i] = a * i;
     }
 }

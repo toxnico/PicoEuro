@@ -7,7 +7,7 @@
 class SquareGenerator: public Generator
 {
     public:
-    float getSample();
+    int getSample();
     void  initLUT(int size);
 };
 

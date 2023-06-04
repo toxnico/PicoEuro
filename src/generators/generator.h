@@ -27,11 +27,11 @@ public:
 
     inline void updateSamplesPerCycle() { samplesPerCycle = sampleRate / frequency; }
     //inline int samplesPerCycle() { return samplesPerCycle; }
-    virtual float getSample();
+    virtual int getSample();
     //int getSampleSquare();
     virtual void initLUT(int size);
 
-    float *lut = NULL;
+    int *lut = NULL;
 
 };
 

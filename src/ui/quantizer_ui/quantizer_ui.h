@@ -30,6 +30,9 @@ private:
     uint64_t _lastConversionDuration_us = 0;
 
 public:
+
+    const char *notes[12] = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
+    
     int currentScaleIndex = 0;
     inline braids::Scale currentScale() { return braids::scales[currentScaleIndex]; }
     //Properties:
@@ -53,6 +56,8 @@ public:
 
     // initialize the voltage values from the scale
     void initVoltages(braids::Scale scale);
+
+    int rootNote();
 };
 
 //Default instance

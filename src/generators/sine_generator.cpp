@@ -1,5 +1,5 @@
 #include "sine_generator.h"
-float SineGenerator::getSample()
+int SineGenerator::getSample()
 {
     if(position > samplesPerCycle - 1)
         position = 0;
@@ -16,11 +16,14 @@ float SineGenerator::getSample()
 void SineGenerator::initLUT(int size)
 {
     this->lutSize = size;
-    this->lut = (float*) malloc(lutSize * sizeof(float));
+    this->lut = (int*) malloc(lutSize * sizeof(int));
     
     for(int i=0;i<lutSize;i++)
     {
         float angle = (float)i* TWO_PI / (float)lutSize;
-        this->lut[i] = sin(angle);
+        float rawSin = sin(angle); //between -1.0 and +1.0
+        this->lut[i] = (rawSin + 1) * 4095 / 2;
+
+        //Serial.println(this->lut[i]);
     }
 }

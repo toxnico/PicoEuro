@@ -97,7 +97,7 @@ public:
 	/**
 	 * @brief if the type is ValueType::Choice, this field contains the available choices
 	 */ 
-	char choices[10][15];
+	char choices[15][15];
 
 	/**
 	 * @brief number of choices
