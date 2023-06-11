@@ -191,6 +191,7 @@ void QuantizerMenuUI::load()
     quantizer->quantificationMode = (QuantificationMode_t)s.mode;
 
     //root note
+    s.rootNote = constrain(s.rootNote, 0, 11);
     menu->root->findByName(MENU_ROOT_NOTE)->setValueInt(s.rootNote);
     
     
